@@ -21,6 +21,29 @@
             --panel-border: rgba(255, 255, 255, 0.1);
             --card-bg: rgba(255, 255, 255, 0.03);
         }
+
+        details.free-option {
+            margin: 20px 0;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 0 20px;
+        }
+        details.free-option > summary {
+            cursor: pointer;
+            padding: 16px 0;
+            font-weight: 600;
+            color: var(--mars-light);
+            list-style: none;
+        }
+        details.free-option > summary::-webkit-details-marker { display: none; }
+        details.free-option > summary::before { content: "\25B8  "; color: var(--mars-orange); }
+        details.free-option[open] > summary::before { content: "\25BE  "; }
+        details.free-option[open] > summary {
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 14px;
+        }
+        details.free-option ol { padding-left: 20px; margin: 8px 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -330,27 +353,6 @@ uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></p
                 usamos. Si en una fase futura necesitas otro proveedor, lo agregas con su propio <code>uv add</code>.
             </p>
 
-            <h2>Obtener tu token gratis (GitHub Models)</h2>
-
-            <p>
-                Para que el agente piense necesita un modelo de IA. Usaremos <strong>GitHub Models</strong>, que da
-                acceso <strong>gratis</strong> a modelos como <code>gpt-4.1-mini</code> con solo una cuenta de GitHub
-                — sin tarjeta. (Límite del plan gratis: ~15 peticiones por minuto, de sobra para aprender.)
-            </p>
-
-            <p>Crea tu token gratis así:</p>
-
-            <ol>
-                <li>En GitHub, ve a <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong>.</li>
-                <li>Pulsa <strong>Generate new token</strong>, ponle un nombre y, en permisos, elige <strong>Models: Read-only</strong>.</li>
-                <li>Pulsa <strong>Generate token</strong> y copia el valor (empieza con <code>github_pat_…</code>). Lo usarás en el archivo <code>.env</code>.</li>
-            </ol>
-
-            <p>
-                Atajo: en <a href="https://github.com/marketplace/models" target="_blank" rel="noopener">github.com/marketplace/models</a>
-                abre cualquier modelo y usa <strong>«Use this model» → «Get developer key»</strong>.
-            </p>
-
             <h2>Tu Primer Agente</h2>
 
             <p>
@@ -387,14 +389,11 @@ load_dotenv()
 
 
 async def main() -> None:
-    # Modelo GRATIS vía GitHub Models (endpoint compatible con OpenAI)
+    # Configurar cliente del modelo (OpenAI)
     client = OpenAIChatCompletionClient(
-        model="openai/gpt-4.1-mini",
-        api_key=os.getenv("GITHUB_TOKEN"),
-        base_url="https://models.github.ai/inference",
+        model="gpt-4o-mini",
+        api_key=os.getenv("OPENAI_API_KEY"),
     )
-    # ¿Tienes una API key de pago de OpenAI? Usa en su lugar:
-    #   model="gpt-4o-mini", api_key=os.getenv("OPENAI_API_KEY")   (y quita base_url)
 
     # Crear agente con instrucciones de misión
     mission_control = client.as_agent(
@@ -440,12 +439,45 @@ Usa terminología espacial apropiada. Sé conciso pero informativo.""",
 if __name__ == "__main__":
     asyncio.run(main())</code></pre>
 
-            <h3>Configurar tu token</h3>
+            <h3>Configurar tu API key</h3>
 
-            <p>Crea un archivo <code>.env</code> en la misma carpeta que el script, con tu token de GitHub:</p>
+            <p>Crea un archivo <code>.env</code> en la misma carpeta que el script, con tu API key de OpenAI:</p>
 
             <pre><code class="language-bash"># .env
+OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
+
+            <details class="free-option">
+                <summary>¿Sin API key de pago? Usa GitHub Models gratis (clic para ver cómo)</summary>
+
+                <p>
+                    <strong>GitHub Models</strong> te da acceso <strong>gratis</strong> a modelos como
+                    <code>gpt-4.1-mini</code> con solo tu cuenta de GitHub — sin tarjeta. (Límite del plan gratis:
+                    ~15 peticiones por minuto, de sobra para aprender.)
+                </p>
+
+                <p><strong>1) Genera un token gratis</strong></p>
+                <ol>
+                    <li>En GitHub: <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</strong>.</li>
+                    <li>Ponle un nombre y una expiración (p.ej. 30 días). En <strong>Repository access</strong>, «Public repositories» basta.</li>
+                    <li>En <strong>Permissions → Add permissions</strong>, busca <strong>Models</strong> y ponlo en <strong>Access: Read-only</strong>.</li>
+                    <li>Pulsa <strong>Generate token</strong> y copia el valor (empieza con <code>github_pat_…</code>); solo se muestra una vez.</li>
+                </ol>
+                <p>
+                    Atajo: en <a href="https://github.com/marketplace/models" target="_blank" rel="noopener">github.com/marketplace/models</a>
+                    abre un modelo → <strong>«Use this model» → «Create Personal Access Token»</strong> (proveedor GitHub, el gratis).
+                </p>
+
+                <p><strong>2) Pon el token en tu <code>.env</code></strong></p>
+                <pre><code class="language-bash"># .env
 GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
+
+                <p><strong>3) Cambia el cliente en <code>01_hello_agent.py</code></strong> por esta versión:</p>
+                <pre><code class="language-python">client = OpenAIChatCompletionClient(
+    model="openai/gpt-4.1-mini",
+    api_key=os.getenv("GITHUB_TOKEN"),
+    base_url="https://models.github.ai/inference",
+)</code></pre>
+            </details>
 
             <h3>Ejecutar</h3>
 

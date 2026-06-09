@@ -323,6 +323,14 @@ cd mision-marte
 # Añadir las dependencias del agente
 uv add agent-framework-openai python-dotenv</code></pre>
 
+            <p>
+                <strong>¿Por qué <code>agent-framework-openai</code> y no <code>agent-framework</code>?</strong>
+                El framework es modular: <code>agent-framework-openai</code> instala el conector de OpenAI y, junto
+                con él, el núcleo (<code>agent-framework-core</code>) que necesitas. El meta-paquete completo
+                <code>agent-framework</code> añade además todos los demás conectores (Azure, Foundry…) que aquí no
+                usamos. Si en una fase futura necesitas otro proveedor, lo agregas con su propio <code>uv add</code>.
+            </p>
+
             <h2>Tu Primer Agente</h2>
 
             <p>

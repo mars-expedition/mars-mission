@@ -30,3 +30,7 @@ desktop.ini
 # Logs y temporales
 *.log
 *.tmp
+
+# Pruebas locales (no se despliegan ni se commitean)
+sandbox/
+.venv/

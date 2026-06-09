@@ -44,6 +44,19 @@
             margin-bottom: 14px;
         }
         details.free-option ol { padding-left: 20px; margin: 8px 0; }
+
+        .content-panel p a,
+        .content-panel li a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.45);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .content-panel p a:hover,
+        .content-panel li a:hover {
+            color: var(--mars-orange);
+            border-bottom-color: var(--mars-orange);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;

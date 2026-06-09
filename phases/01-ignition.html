@@ -377,11 +377,13 @@
                 así que no hay que crear proyecto ni entorno virtual — <code>uv run</code> lo prepara todo solo.
             </p>
 
-            <pre><code class="language-bash"># Crear el script (uv genera el bloque de metadatos)
-uv init --script 01_hello_agent.py
+            <p>Crea el script (uv genera el bloque de metadatos PEP 723):</p>
 
-# Declarar las dependencias dentro del propio script
-uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></pre>
+            <pre><code class="language-bash">uv init --script 01_hello_agent.py</code></pre>
+
+            <p>Declara las dependencias dentro del propio script:</p>
+
+            <pre><code class="language-bash">uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></pre>
 
             <p>
                 <strong>¿Por qué <code>agent-framework-openai</code> y no <code>agent-framework</code>?</strong>
@@ -447,8 +449,7 @@ if __name__ == "__main__":
 
             <p>Crea un archivo <code>.env</code> en la misma carpeta que el script, con tu API key de OpenAI:</p>
 
-            <pre><code class="language-bash"># .env
-OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
+            <pre><code class="language-bash">OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
 
             <details class="free-option">
                 <summary>¿Sin API key de pago? Usa GitHub Models gratis (clic para ver cómo)</summary>
@@ -472,8 +473,7 @@ OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
                 </p>
 
                 <p><strong>2) Pon el token en tu <code>.env</code></strong></p>
-                <pre><code class="language-bash"># .env
-GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
+                <pre><code class="language-bash">GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
 
                 <p><strong>3) Cambia el cliente</strong> por esta versión (sirve para cualquiera de los 3 scripts):</p>
                 <pre><code class="language-python">client = OpenAIChatCompletionClient(

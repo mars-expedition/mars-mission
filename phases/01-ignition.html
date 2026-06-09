@@ -57,6 +57,31 @@
             color: var(--mars-orange);
             border-bottom-color: var(--mars-orange);
         }
+
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--mars-light);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+        .copy-btn:hover { background: rgba(255, 107, 53, 0.3); }
+        .copy-btn.copied {
+            color: #7CFC98;
+            border-color: rgba(124, 252, 152, 0.5);
+            background: rgba(124, 252, 152, 0.12);
+            opacity: 1;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -366,21 +391,18 @@ uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></p
                 usamos. Si en una fase futura necesitas otro proveedor, lo agregas con su propio <code>uv add</code>.
             </p>
 
-            <h2>Tu Primer Agente</h2>
+            <h2>Paso 1 · Tu primer agente</h2>
 
             <p>
-                El ejemplo usa <code>async</code>/<code>await</code>: la forma de Python de pedir algo que tarda
-                (como la respuesta del modelo) sin congelar el programa. Si es nuevo para ti, basta con seguir
-                el patrón del ejemplo.
+                El código usa <code>async</code>/<code>await</code>: la forma de Python de pedir algo que tarda
+                (como la respuesta del modelo) sin congelar el programa. Si es nuevo para ti, basta con seguir el patrón.
             </p>
-
-            <h3>01_hello_agent.py</h3>
 
             <p>
-                <code>uv</code> ya creó este archivo con el bloque <code># /// script ///</code> de arriba (donde
-                quedaron las dependencias). Reemplaza el cuerpo de ejemplo con este código y deja el bloque tal cual:
+                <code>uv</code> ya creó <code>01_hello_agent.py</code> con el bloque <code># /// script ///</code>
+                (donde quedaron las dependencias). Reemplaza el cuerpo de ejemplo con este código:
             </p>
-            
+
             <pre><code class="language-python"># /// script
 # requires-python = ">=3.10"
 # dependencies = [
@@ -388,10 +410,7 @@ uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></p
 #     "python-dotenv",
 # ]
 # ///
-"""
-MISIÓN MARTE - Fase 01: IGNITION
-Tu primer agente con Microsoft Agent Framework.
-"""
+"""MISION MARTE - Fase 01: tu primer agente."""
 import asyncio
 import os
 
@@ -400,53 +419,25 @@ from agent_framework.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 
+INSTRUCCIONES = (
+    "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
+    "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso."
+)
+
 
 async def main() -> None:
-    # Configurar cliente del modelo (OpenAI)
+    # Cliente del modelo (OpenAI)
     client = OpenAIChatCompletionClient(
         model="gpt-4o-mini",
         api_key=os.getenv("OPENAI_API_KEY"),
     )
 
-    # Crear agente con instrucciones de misión
-    mission_control = client.as_agent(
-        name="MissionControl",
-        instructions="""Eres el Control de Misión de MISIÓN MARTE.
-        
-Tu rol es:
-- Coordinar operaciones de la misión a Marte
-- Dar briefings técnicos a la tripulación
-- Responder consultas con precisión y claridad
+    # Crear el agente con su rol
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
 
-Usa terminología espacial apropiada. Sé conciso pero informativo.""",
-    )
-    
-    # ═══════════════════════════════════════════════════════════
-    # MODO SÍNCRONO: Espera toda la respuesta
-    # ═══════════════════════════════════════════════════════════
-    print("MISIÓN MARTE - Control de Misión\n")
-    print("=" * 50)
-    
-    response = await mission_control.run(
-        "Control, solicito briefing del estado de la misión."
-    )
+    # Una consulta, una respuesta completa
+    response = await mission_control.run("Control, solicito briefing del estado de la mision.")
     print(f"CONTROL: {response.text}")
-    
-    # ═══════════════════════════════════════════════════════════
-    # MODO STREAMING: Respuesta token por token
-    # ═══════════════════════════════════════════════════════════
-    print("\n" + "=" * 50)
-    print("Transmisión en tiempo real:\n")
-    
-    print("CONTROL: ", end="", flush=True)
-    async for chunk in mission_control.run(
-        "¿Cuál es el estado actual de los sistemas de propulsión?",
-        stream=True,
-    ):
-        if chunk.text:
-            print(chunk.text, end="", flush=True)
-    
-    print("\n")
 
 
 if __name__ == "__main__":
@@ -484,7 +475,7 @@ OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
                 <pre><code class="language-bash"># .env
 GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
 
-                <p><strong>3) Cambia el cliente en <code>01_hello_agent.py</code></strong> por esta versión:</p>
+                <p><strong>3) Cambia el cliente</strong> por esta versión (sirve para cualquiera de los 3 scripts):</p>
                 <pre><code class="language-python">client = OpenAIChatCompletionClient(
     model="openai/gpt-4.1-mini",
     api_key=os.getenv("GITHUB_TOKEN"),
@@ -496,19 +487,127 @@ GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
 
             <pre><code class="language-bash">uv run 01_hello_agent.py</code></pre>
 
-            <h2>Síncrono vs Streaming</h2>
-            
+            <h2>Paso 2 · Streaming</h2>
+
             <p>
-                <strong>Modo síncrono:</strong> <code>await agent.run(input)</code> — El programa espera hasta recibir
-                la respuesta completa. Útil cuando necesitas la respuesta entera antes de seguir (por ejemplo, para
-                tomar una decisión o guardar el resultado).
+                Con <code>await agent.run(texto)</code> esperas toda la respuesta. Con <code>stream=True</code> la
+                recibes <strong>en fragmentos, en tiempo real</strong>: el texto aparece mientras se genera, ideal para
+                interfaces tipo chat.
             </p>
-            
+
+            <p>Crea <code>02_streaming.py</code>:</p>
+
+            <pre><code class="language-python"># /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "agent-framework-openai",
+#     "python-dotenv",
+# ]
+# ///
+"""MISION MARTE - Fase 01: streaming."""
+import asyncio
+import os
+
+from dotenv import load_dotenv
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()
+
+INSTRUCCIONES = (
+    "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
+    "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso."
+)
+
+
+async def main() -> None:
+    client = OpenAIChatCompletionClient(
+        model="gpt-4o-mini",
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
+
+    # La respuesta llega token por token
+    print("CONTROL: ", end="", flush=True)
+    async for chunk in mission_control.run(
+        "Informe del estado de los sistemas de propulsion.",
+        stream=True,
+    ):
+        if chunk.text:
+            print(chunk.text, end="", flush=True)
+    print()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+
+            <p>Ejecuta y observa cómo el texto aparece progresivamente:</p>
+
+            <pre><code class="language-bash">uv run 02_streaming.py</code></pre>
+
+            <h2>Paso 3 · Conversación interactiva</h2>
+
             <p>
-                <strong>Modo streaming:</strong> <code>async for chunk in agent.run(input, stream=True)</code> —
-                Recibes la respuesta en fragmentos, en tiempo real. Ideal para interfaces tipo chat donde quieres
-                mostrarla progresivamente.
+                Hasta aquí el agente responde una vez y termina. Para <strong>conversar</strong> con él necesitas dos
+                cosas: un bucle que lea lo que escribes y una <strong>sesión</strong> que le dé <strong>memoria</strong>
+                de los turnos anteriores. La sesión se crea con <code>agent.create_session()</code> y se pasa a cada
+                <code>run(...)</code>.
             </p>
+
+            <p>Crea <code>03_chat.py</code>:</p>
+
+            <pre><code class="language-python"># /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "agent-framework-openai",
+#     "python-dotenv",
+# ]
+# ///
+"""MISION MARTE - Fase 01: conversacion interactiva."""
+import asyncio
+import os
+
+from dotenv import load_dotenv
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()
+
+INSTRUCCIONES = (
+    "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
+    "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso."
+)
+
+
+async def main() -> None:
+    client = OpenAIChatCompletionClient(
+        model="gpt-4o-mini",
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
+
+    # La sesion guarda la memoria de la conversacion
+    session = mission_control.create_session()
+
+    print("Control de Mision en linea. Escribe 'salir' para terminar.\n")
+    while True:
+        user = input("TU: ")
+        if user.strip().lower() in {"salir", "exit", "quit"}:
+            print("Cierre de comunicaciones. Cambio y fuera.")
+            break
+
+        # session=session  ->  el agente recuerda lo dicho antes
+        print("CONTROL: ", end="", flush=True)
+        async for chunk in mission_control.run(user, session=session, stream=True):
+            if chunk.text:
+                print(chunk.text, end="", flush=True)
+        print("\n")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+
+            <p>Ejecuta y conversa. Prueba la memoria: dile tu nombre y, en otro turno, pregúntale cuál es.</p>
+
+            <pre><code class="language-bash">uv run 03_chat.py</code></pre>
 
             <div class="checkpoint">
                 <h3>
@@ -543,6 +642,12 @@ GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
                             <polyline points="20 6 9 17 4 12"/>
                         </svg>
                         Usar streaming con <code>stream=True</code>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Conversar con memoria usando <code>create_session()</code>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -616,6 +721,27 @@ GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
 
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('load', () => { resizeCanvas(); animate(); });
+
+        // Botón "Copiar" en cada bloque de código
+        document.querySelectorAll('pre').forEach((pre) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.type = 'button';
+            btn.textContent = 'Copiar';
+            btn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code ? code.innerText : pre.innerText).replace(/\s+$/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = '¡Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copiar';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+            pre.appendChild(btn);
+        });
     </script>
 </body>
 </html>

@@ -309,12 +309,12 @@
 
             <h2>Instalación</h2>
             
-            <pre><code class="language-bash"># Crear entorno virtual
-python -m venv .venv
+            <pre><code class="language-bash"># Crear entorno virtual con uv
+uv venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Instalar Microsoft Agent Framework
-pip install agent-framework python-dotenv</code></pre>
+uv pip install agent-framework python-dotenv</code></pre>
 
             <h2>Tu Primer Agente</h2>
             

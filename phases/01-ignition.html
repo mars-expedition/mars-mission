@@ -336,12 +336,12 @@ load_dotenv()
 async def main() -> None:
     # Configurar cliente del modelo
     client = OpenAIChatClient(
-        model_id="gpt-4o",
+        model="gpt-4o",
         api_key=os.getenv("OPENAI_API_KEY"),
     )
 
     # Crear agente con instrucciones de misión
-    mission_control = client.create_agent(
+    mission_control = client.as_agent(
         name="MissionControl",
         instructions="""Eres el Control de Misión de MISIÓN MARTE.
         

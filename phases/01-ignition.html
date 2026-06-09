@@ -260,7 +260,8 @@
             <h1 class="phase-title">Encendido: Fundamentos del Framework</h1>
             <p class="phase-description">
                 Los motores se encienden. En esta fase aprenderás los fundamentos de Microsoft Agent Framework,
-                crearás tu primer agente y dominarás la diferencia entre ejecución síncrona y streaming.
+                crearás tu primer agente y dominarás la diferencia entre ejecución síncrona (esperar la respuesta
+                completa) y streaming (verla aparecer en tiempo real).
             </p>
 
             <h2>Conceptos Fundamentales</h2>
@@ -274,7 +275,7 @@
                         <circle cx="24" cy="24" r="4" fill="rgba(255,107,53,0.3)"/>
                     </svg>
                     <h4>LLM</h4>
-                    <p>El cerebro base. Comprende y genera lenguaje natural.</p>
+                    <p>El cerebro base: el modelo de IA (como GPT) que entiende y genera texto.</p>
                 </div>
                 <div class="concept-card">
                     <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -283,7 +284,7 @@
                         <circle cx="24" cy="16" r="4"/>
                     </svg>
                     <h4>Agent</h4>
-                    <p>Sistema autónomo con rol e instrucciones.</p>
+                    <p>Un asistente con rol e instrucciones propias que actúa por su cuenta.</p>
                 </div>
                 <div class="concept-card">
                     <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -293,7 +294,7 @@
                         <circle cx="31" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
                     </svg>
                     <h4>Streaming</h4>
-                    <p>Respuesta token por token en tiempo real.</p>
+                    <p>La respuesta aparece poco a poco, en tiempo real (como ver a alguien escribir).</p>
                 </div>
                 <div class="concept-card">
                     <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -303,12 +304,18 @@
                         <path d="M33 36h6M36 33v6"/>
                     </svg>
                     <h4>Session</h4>
-                    <p>Contexto entre múltiples turnos.</p>
+                    <p>La memoria de la conversación: recuerda los mensajes anteriores.</p>
                 </div>
             </div>
 
             <h2>Instalación</h2>
-            
+
+            <p>
+                Trabajaremos dentro de un <strong>entorno virtual</strong> (una carpeta aislada con las librerías
+                de este proyecto, para no mezclarlas con las del resto de tu sistema). Lo creamos e instalamos las
+                dependencias con <code>uv</code>, un gestor de paquetes de Python muy rápido.
+            </p>
+
             <pre><code class="language-bash"># Crear entorno virtual con uv
 uv venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
@@ -317,7 +324,13 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 uv pip install agent-framework python-dotenv</code></pre>
 
             <h2>Tu Primer Agente</h2>
-            
+
+            <p>
+                El ejemplo usa <code>async</code>/<code>await</code>: la forma de Python de pedir algo que tarda
+                (como la respuesta del modelo) sin congelar el programa. Si es nuevo para ti, basta con seguir
+                el patrón del ejemplo.
+            </p>
+
             <h3>01_hello_agent.py</h3>
             
             <pre><code class="language-python">"""
@@ -399,14 +412,15 @@ python 01_hello_agent.py</code></pre>
             <h2>Síncrono vs Streaming</h2>
             
             <p>
-                <strong>Modo síncrono:</strong> <code>await agent.run(input)</code> — El programa espera hasta recibir 
-                la respuesta completa. Útil para procesamiento batch o cuando necesitas la respuesta completa para decisiones.
+                <strong>Modo síncrono:</strong> <code>await agent.run(input)</code> — El programa espera hasta recibir
+                la respuesta completa. Útil cuando necesitas la respuesta entera antes de seguir (por ejemplo, para
+                tomar una decisión o guardar el resultado).
             </p>
             
             <p>
-                <strong>Modo streaming:</strong> <code>async for chunk in agent.run(input, stream=True)</code> — 
-                Recibes tokens en tiempo real. Ideal para interfaces de usuario donde quieres mostrar 
-                la respuesta progresivamente.
+                <strong>Modo streaming:</strong> <code>async for chunk in agent.run(input, stream=True)</code> —
+                Recibes la respuesta en fragmentos, en tiempo real. Ideal para interfaces tipo chat donde quieres
+                mostrarla progresivamente.
             </p>
 
             <div class="checkpoint">

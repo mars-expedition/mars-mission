@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGNITION - MISIÓN MARTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --bg-space: #0a0612;
+            --mars-orange: #ff6b35;
+            --mars-red: #ff3b30;
+            --mars-light: #ff9f68;
+            --mars-glow: #ffcba4;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.75);
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-space);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 6, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ff9f68, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .nav-back {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none; font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-back:hover { color: var(--mars-orange); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 40px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 50px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .phase-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            padding: 10px 18px; border-radius: 100px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;
+            color: var(--mars-light); margin-bottom: 24px;
+        }
+        .phase-badge svg { width: 18px; height: 18px; }
+        
+        .phase-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #ffcba4, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .phase-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem; font-weight: 600;
+            margin: 50px 0 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+            color: var(--mars-light);
+        }
+        h3 {
+            font-size: 1.1rem; font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--mars-orange);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin: 28px 0;
+        }
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            text-align: center;
+        }
+        .concept-card svg { width: 40px; height: 40px; margin-bottom: 12px; }
+        .concept-card h4 {
+            font-size: 1rem; color: var(--mars-orange); margin: 0 0 10px; font-weight: 600;
+        }
+        .concept-card p {
+            font-size: 0.85rem; margin: 0; line-height: 1.5;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 24px !important;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--mars-light);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, rgba(255,159,104,0.08), rgba(255,107,53,0.08));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 104, 0.25);
+            border-radius: 18px;
+            padding: 32px; margin: 50px 0;
+        }
+        .checkpoint h3 {
+            color: var(--mars-glow);
+            margin-top: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .checkpoint h3 svg { width: 24px; height: 24px; }
+        .checkpoint ul {
+            list-style: none; padding: 0;
+            margin-top: 16px;
+        }
+        .checkpoint li {
+            display: flex; align-items: center; gap: 12px;
+            margin: 12px 0; color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between;
+            margin-top: 50px; padding-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .nav-btn {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            padding: 16px 28px; border-radius: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .nav-btn:hover {
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
+            border: none;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
+        }
+        .nav-btn svg { width: 18px; height: 18px; }
+        .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .page-content { padding: 100px 16px 40px; }
+            .content-panel { padding: 30px 24px; }
+            .phase-title { font-size: 1.6rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+            </svg>
+            MISIÓN MARTE
+        </a>
+        <a href="../index.html#expedicion" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver a la expedición
+        </a>
+    </nav>
+
+    <div class="page-content">
+        <div class="content-panel">
+            <div class="phase-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                    <circle cx="12" cy="12" r="4" fill="rgba(255,107,53,0.3)"/>
+                    <path d="M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>
+                </svg>
+                FASE 01 · IGNITION
+            </div>
+            <h1 class="phase-title">Encendido: Fundamentos del Framework</h1>
+            <p class="phase-description">
+                Los motores se encienden. En esta fase aprenderás los fundamentos de Microsoft Agent Framework,
+                crearás tu primer agente y dominarás la diferencia entre ejecución síncrona y streaming.
+            </p>
+
+            <h2>Conceptos Fundamentales</h2>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="24" cy="24" r="18"/>
+                        <path d="M24 12c-4 0-8 4-8 8s2 6 4 8c2 2 4 6 4 8"/>
+                        <path d="M24 12c4 0 8 4 8 8s-2 6-4 8c-2 2-4 6-4 8"/>
+                        <circle cx="24" cy="24" r="4" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>LLM</h4>
+                    <p>El cerebro base. Comprende y genera lenguaje natural.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="24" cy="16" r="10" fill="rgba(255,107,53,0.2)"/>
+                        <path d="M12 40c0-8 5-14 12-14s12 6 12 14"/>
+                        <circle cx="24" cy="16" r="4"/>
+                    </svg>
+                    <h4>Agent</h4>
+                    <p>Sistema autónomo con rol e instrucciones.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 24h6M18 24h6M28 24h6M38 24h2"/>
+                        <circle cx="11" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
+                        <circle cx="21" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
+                        <circle cx="31" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>Streaming</h4>
+                    <p>Respuesta token por token en tiempo real.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="8" y="8" width="32" height="32" rx="4"/>
+                        <path d="M16 20h16M16 28h10"/>
+                        <circle cx="36" cy="36" r="8" fill="rgba(255,107,53,0.2)"/>
+                        <path d="M33 36h6M36 33v6"/>
+                    </svg>
+                    <h4>Session</h4>
+                    <p>Contexto entre múltiples turnos.</p>
+                </div>
+            </div>
+
+            <h2>Instalación</h2>
+            
+            <pre><code class="language-bash"># Crear entorno virtual
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Instalar Microsoft Agent Framework
+pip install agent-framework python-dotenv</code></pre>
+
+            <h2>Tu Primer Agente</h2>
+            
+            <h3>01_hello_agent.py</h3>
+            
+            <pre><code class="language-python">"""
+MISIÓN MARTE - Fase 01: IGNITION
+Tu primer agente con Microsoft Agent Framework.
+"""
+import asyncio
+import os
+
+from dotenv import load_dotenv
+from agent_framework.openai import OpenAIChatClient
+
+load_dotenv()
+
+
+async def main() -> None:
+    # Configurar cliente del modelo
+    client = OpenAIChatClient(
+        model="gpt-4o",
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+    
+    # Crear agente con instrucciones de misión
+    mission_control = client.as_agent(
+        name="MissionControl",
+        instructions="""Eres el Control de Misión de MISIÓN MARTE.
+        
+Tu rol es:
+- Coordinar operaciones de la misión a Marte
+- Dar briefings técnicos a la tripulación
+- Responder consultas con precisión y claridad
+
+Usa terminología espacial apropiada. Sé conciso pero informativo.""",
+    )
+    
+    # ═══════════════════════════════════════════════════════════
+    # MODO SÍNCRONO: Espera toda la respuesta
+    # ═══════════════════════════════════════════════════════════
+    print("MISIÓN MARTE - Control de Misión\n")
+    print("=" * 50)
+    
+    response = await mission_control.run(
+        "Control, solicito briefing del estado de la misión."
+    )
+    print(f"CONTROL: {response.text}")
+    
+    # ═══════════════════════════════════════════════════════════
+    # MODO STREAMING: Respuesta token por token
+    # ═══════════════════════════════════════════════════════════
+    print("\n" + "=" * 50)
+    print("Transmisión en tiempo real:\n")
+    
+    print("CONTROL: ", end="", flush=True)
+    async for chunk in mission_control.run(
+        "¿Cuál es el estado actual de los sistemas de propulsión?",
+        stream=True,
+    ):
+        if chunk.text:
+            print(chunk.text, end="", flush=True)
+    
+    print("\n")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+
+            <h3>Configurar Variables de Entorno</h3>
+            
+            <p>Crea un archivo <code>.env</code> en la raíz del proyecto:</p>
+            
+            <pre><code class="language-bash"># .env
+OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
+
+            <h3>Ejecutar</h3>
+            
+            <pre><code class="language-bash">cd phases/01-ignition
+python 01_hello_agent.py</code></pre>
+
+            <h2>Síncrono vs Streaming</h2>
+            
+            <p>
+                <strong>Modo síncrono:</strong> <code>await agent.run(input)</code> — El programa espera hasta recibir 
+                la respuesta completa. Útil para procesamiento batch o cuando necesitas la respuesta completa para decisiones.
+            </p>
+            
+            <p>
+                <strong>Modo streaming:</strong> <code>async for chunk in agent.run(input, stream=True)</code> — 
+                Recibes tokens en tiempo real. Ideal para interfaces de usuario donde quieres mostrar 
+                la respuesta progresivamente.
+            </p>
+
+            <div class="checkpoint">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Checkpoint: IGNITION Completo
+                </h3>
+                <p style="color: var(--text-secondary); margin-top: 8px;">Antes de avanzar a la fase LAUNCH, verifica que puedes:</p>
+                <ul>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Crear un cliente con <code>OpenAIChatClient</code>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Crear un agente con <code>client.as_agent()</code>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Ejecutar consultas síncronas con <code>await agent.run()</code>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Usar streaming con <code>stream=True</code>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Configurar variables de entorno con <code>.env</code>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="../index.html#expedicion" class="nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver al inicio
+                </a>
+                <span class="nav-btn primary disabled">
+                    Próximamente: LAUNCH
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Estrellas animadas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.85 ? `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : '#ffffff'
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * star.twinkleSpeed) * 0.01;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color === '#ffffff' ? 
+                    `rgba(255, 255, 255, ${star.opacity})` : star.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => { resizeCanvas(); animate(); });
+    </script>
+</body>
+</html>

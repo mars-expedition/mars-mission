@@ -1246,32 +1246,24 @@
                 <div class="qs-step">
                     <div class="qs-number">2</div>
                     <div class="qs-content">
-                        <h4>Crear entorno virtual</h4>
-                        <code>cd mision-marte && uv venv</code>
+                        <h4>Instalar dependencias</h4>
+                        <code>cd mision-marte && uv sync</code>
                     </div>
                 </div>
-                
+
                 <div class="qs-step">
                     <div class="qs-number">3</div>
-                    <div class="qs-content">
-                        <h4>Activar e instalar</h4>
-                        <code>source .venv/bin/activate && uv pip install -r requirements.txt</code>
-                    </div>
-                </div>
-                
-                <div class="qs-step">
-                    <div class="qs-number">4</div>
                     <div class="qs-content">
                         <h4>Configurar API key</h4>
                         <code>cp .env.example .env && nano .env</code>
                     </div>
                 </div>
-                
+
                 <div class="qs-step">
-                    <div class="qs-number">5</div>
+                    <div class="qs-number">4</div>
                     <div class="qs-content">
                         <h4>¡Lanzar primer agente!</h4>
-                        <code>python phases/01-ignition/01_hello_agent.py</code>
+                        <code>uv run phases/01-ignition/01_hello_agent.py</code>
                     </div>
                 </div>
             </div>

@@ -311,17 +311,17 @@
             <h2>Instalación</h2>
 
             <p>
-                Trabajaremos dentro de un <strong>entorno virtual</strong> (una carpeta aislada con las librerías
-                de este proyecto, para no mezclarlas con las del resto de tu sistema). Lo creamos e instalamos las
-                dependencias con <code>uv</code>, un gestor de paquetes de Python muy rápido.
+                Usaremos <code>uv</code>, un gestor de paquetes de Python muy rápido. Con uv no necesitas crear ni
+                activar el entorno virtual a mano: lo gestiona por ti automáticamente al iniciar el proyecto y añadir
+                las dependencias.
             </p>
 
-            <pre><code class="language-bash"># Crear entorno virtual con uv
-uv venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+            <pre><code class="language-bash"># Inicializar el proyecto
+uv init mision-marte
+cd mision-marte
 
-# Instalar Microsoft Agent Framework
-uv pip install agent-framework python-dotenv</code></pre>
+# Añadir las dependencias del agente
+uv add agent-framework-openai python-dotenv</code></pre>
 
             <h2>Tu Primer Agente</h2>
 
@@ -405,9 +405,8 @@ if __name__ == "__main__":
 OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
 
             <h3>Ejecutar</h3>
-            
-            <pre><code class="language-bash">cd phases/01-ignition
-python 01_hello_agent.py</code></pre>
+
+            <pre><code class="language-bash">uv run 01_hello_agent.py</code></pre>
 
             <h2>Síncrono vs Streaming</h2>
             

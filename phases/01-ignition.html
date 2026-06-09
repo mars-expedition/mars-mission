@@ -311,17 +311,16 @@
             <h2>Instalación</h2>
 
             <p>
-                Usaremos <code>uv</code>, un gestor de paquetes de Python muy rápido. Con uv no necesitas crear ni
-                activar el entorno virtual a mano: lo gestiona por ti automáticamente al iniciar el proyecto y añadir
-                las dependencias.
+                Usaremos <code>uv</code>, un gestor de paquetes de Python muy rápido. Trabajaremos con un
+                <strong>script único</strong>: las dependencias viven dentro del propio archivo (formato PEP 723),
+                así que no hay que crear proyecto ni entorno virtual — <code>uv run</code> lo prepara todo solo.
             </p>
 
-            <pre><code class="language-bash"># Inicializar el proyecto
-uv init mision-marte
-cd mision-marte
+            <pre><code class="language-bash"># Crear el script (uv genera el bloque de metadatos)
+uv init --script 01_hello_agent.py
 
-# Añadir las dependencias del agente
-uv add agent-framework-openai python-dotenv</code></pre>
+# Declarar las dependencias dentro del propio script
+uv add --script 01_hello_agent.py agent-framework-openai python-dotenv</code></pre>
 
             <p>
                 <strong>¿Por qué <code>agent-framework-openai</code> y no <code>agent-framework</code>?</strong>
@@ -329,6 +328,27 @@ uv add agent-framework-openai python-dotenv</code></pre>
                 con él, el núcleo (<code>agent-framework-core</code>) que necesitas. El meta-paquete completo
                 <code>agent-framework</code> añade además todos los demás conectores (Azure, Foundry…) que aquí no
                 usamos. Si en una fase futura necesitas otro proveedor, lo agregas con su propio <code>uv add</code>.
+            </p>
+
+            <h2>Obtener tu token gratis (GitHub Models)</h2>
+
+            <p>
+                Para que el agente piense necesita un modelo de IA. Usaremos <strong>GitHub Models</strong>, que da
+                acceso <strong>gratis</strong> a modelos como <code>gpt-4.1-mini</code> con solo una cuenta de GitHub
+                — sin tarjeta. (Límite del plan gratis: ~15 peticiones por minuto, de sobra para aprender.)
+            </p>
+
+            <p>Crea tu token gratis así:</p>
+
+            <ol>
+                <li>En GitHub, ve a <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong>.</li>
+                <li>Pulsa <strong>Generate new token</strong>, ponle un nombre y, en permisos, elige <strong>Models: Read-only</strong>.</li>
+                <li>Pulsa <strong>Generate token</strong> y copia el valor (empieza con <code>github_pat_…</code>). Lo usarás en el archivo <code>.env</code>.</li>
+            </ol>
+
+            <p>
+                Atajo: en <a href="https://github.com/marketplace/models" target="_blank" rel="noopener">github.com/marketplace/models</a>
+                abre cualquier modelo y usa <strong>«Use this model» → «Get developer key»</strong>.
             </p>
 
             <h2>Tu Primer Agente</h2>
@@ -340,8 +360,20 @@ uv add agent-framework-openai python-dotenv</code></pre>
             </p>
 
             <h3>01_hello_agent.py</h3>
+
+            <p>
+                <code>uv</code> ya creó este archivo con el bloque <code># /// script ///</code> de arriba (donde
+                quedaron las dependencias). Reemplaza el cuerpo de ejemplo con este código y deja el bloque tal cual:
+            </p>
             
-            <pre><code class="language-python">"""
+            <pre><code class="language-python"># /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "agent-framework-openai",
+#     "python-dotenv",
+# ]
+# ///
+"""
 MISIÓN MARTE - Fase 01: IGNITION
 Tu primer agente con Microsoft Agent Framework.
 """
@@ -349,17 +381,20 @@ import asyncio
 import os
 
 from dotenv import load_dotenv
-from agent_framework.openai import OpenAIChatClient
+from agent_framework.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 
 
 async def main() -> None:
-    # Configurar cliente del modelo
-    client = OpenAIChatClient(
-        model="gpt-4o",
-        api_key=os.getenv("OPENAI_API_KEY"),
+    # Modelo GRATIS vía GitHub Models (endpoint compatible con OpenAI)
+    client = OpenAIChatCompletionClient(
+        model="openai/gpt-4.1-mini",
+        api_key=os.getenv("GITHUB_TOKEN"),
+        base_url="https://models.github.ai/inference",
     )
+    # ¿Tienes una API key de pago de OpenAI? Usa en su lugar:
+    #   model="gpt-4o-mini", api_key=os.getenv("OPENAI_API_KEY")   (y quita base_url)
 
     # Crear agente con instrucciones de misión
     mission_control = client.as_agent(
@@ -405,12 +440,12 @@ Usa terminología espacial apropiada. Sé conciso pero informativo.""",
 if __name__ == "__main__":
     asyncio.run(main())</code></pre>
 
-            <h3>Configurar Variables de Entorno</h3>
-            
-            <p>Crea un archivo <code>.env</code> en la raíz del proyecto:</p>
-            
+            <h3>Configurar tu token</h3>
+
+            <p>Crea un archivo <code>.env</code> en la misma carpeta que el script, con tu token de GitHub:</p>
+
             <pre><code class="language-bash"># .env
-OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
+GITHUB_TOKEN=github_pat_tu_token_aqui</code></pre>
 
             <h3>Ejecutar</h3>
 
@@ -444,7 +479,7 @@ OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="20 6 9 17 4 12"/>
                         </svg>
-                        Crear un cliente con <code>OpenAIChatClient</code>
+                        Crear un cliente con <code>OpenAIChatCompletionClient</code>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

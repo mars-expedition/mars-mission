@@ -9,7 +9,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -32,7 +32,7 @@
         html { scroll-behavior: smooth; }
         
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Titillium Web', -apple-system, sans-serif;
             background: var(--bg-space);
             color: var(--text-primary);
             line-height: 1.6;
@@ -429,22 +429,27 @@
         }
 
         .nav-cta {
+            position: relative;
+            overflow: hidden;
             background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
             color: white;
-            padding: 10px 24px;
-            border-radius: 10px;
+            padding: 11px 22px;
             text-decoration: none;
+            font-family: 'Orbitron', monospace;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: transform 0.3s, filter 0.3s;
         }
 
         .nav-cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.5));
         }
 
         .nav-cta svg {
@@ -536,24 +541,63 @@
             flex-wrap: wrap;
         }
 
-        .btn-primary {
+        .btn-primary,
+        .btn-secondary {
+            position: relative;
+            overflow: hidden;
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            padding: 16px 30px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
+        }
+
+        /* Destello que recorre el botón al pasar el cursor */
+        .btn-primary::before,
+        .btn-secondary::before,
+        .nav-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -130%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .btn-primary:hover::before,
+        .btn-secondary:hover::before,
+        .nav-cta:hover::before { left: 150%; }
+
+        .btn-primary {
             background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
             color: white;
-            padding: 16px 32px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.35);
+            filter: drop-shadow(0 6px 18px rgba(255, 107, 53, 0.35));
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.5);
+            filter: drop-shadow(0 10px 28px rgba(255, 107, 53, 0.55));
+        }
+
+        .btn-primary:active,
+        .btn-secondary:active,
+        .nav-cta:active { transform: translateY(-1px) scale(0.98); }
+
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        .nav-cta:focus-visible {
+            outline: 2px solid var(--mars-glow);
+            outline-offset: 3px;
         }
 
         .btn-primary svg {
@@ -562,23 +606,16 @@
         }
 
         .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
             background: var(--card-bg);
             border: 1px solid var(--panel-border);
             color: var(--text-primary);
-            padding: 16px 32px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s;
         }
 
         .btn-secondary:hover {
+            transform: translateY(-3px);
             border-color: var(--mars-orange);
             background: rgba(255, 107, 53, 0.1);
+            filter: drop-shadow(0 8px 20px rgba(255, 107, 53, 0.2));
         }
 
         .btn-secondary svg {
@@ -956,8 +993,35 @@
             .timeline::before { left: 20px; }
             .phase-marker { left: -55px; }
             .phase-number { width: 44px; height: 44px; font-size: 0.85rem; }
-            
+
             .footer-links { flex-direction: column; gap: 16px; }
+
+            /* Hero compacto, sin desbordes */
+            .hero-badge {
+                white-space: normal;
+                text-align: center;
+                line-height: 1.7;
+                font-size: 0.6rem;
+                letter-spacing: 1.5px;
+            }
+            .hero-title { font-size: clamp(1.9rem, 10vw, 2.5rem); }
+            .hero-subtitle { font-size: 0.68rem; letter-spacing: 2px; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+
+            /* Ruta recta y sin etiquetas de planetas */
+            .phase-marker { --mx: 0px !important; }
+            .route-endpoint text { display: none; }
+
+            /* Escena a ancho completo bajo el texto */
+            .timeline .phase-content { grid-template-columns: 1fr; }
+            .phase-scene {
+                grid-column: 1;
+                grid-row: auto;
+                justify-self: center;
+                width: 186px;
+                height: 130px;
+                margin-top: 8px;
+            }
         }
     </style>
 </head>
@@ -1739,7 +1803,7 @@
             </div>
             <p class="footer-quote">
                 "La Tierra es la cuna de la humanidad, pero no se puede vivir en una cuna para siempre."
-                — Konstantin Tsiolkovsky
+                - Konstantin Tsiolkovsky
             </p>
             <p class="footer-copy">
                 © 2026 MISIÓN MARTE · <strong>El desafío del hombre rumbo a Marte</strong>

@@ -6,7 +6,7 @@
     <title>IGNITION - MISIÓN MARTE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
         :root {
@@ -68,7 +68,7 @@
             border: 1px solid rgba(255, 107, 53, 0.4);
             border-radius: 6px;
             padding: 4px 10px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Titillium Web', sans-serif;
             font-size: 12px;
             cursor: pointer;
             opacity: 0;
@@ -96,7 +96,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Titillium Web', sans-serif;
             background: var(--bg-space);
             color: var(--text-primary);
             line-height: 1.7;
@@ -269,24 +269,45 @@
             flex-wrap: wrap; gap: 16px;
         }
         .nav-btn {
+            position: relative; overflow: hidden;
             display: flex; align-items: center; gap: 12px;
             background: var(--card-bg);
             border: 1px solid var(--panel-border);
-            padding: 16px 28px; border-radius: 14px;
+            padding: 15px 26px;
             color: var(--text-primary);
             text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.74rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
         }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -130%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .nav-btn:hover::before { left: 150%; }
         .nav-btn:hover {
+            transform: translateY(-2px);
             border-color: var(--mars-orange);
             background: rgba(255, 107, 53, 0.1);
         }
+        .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-btn:focus-visible { outline: 2px solid var(--mars-glow); outline-offset: 3px; }
         .nav-btn.primary {
             background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
             border: none;
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.35));
         }
+        .nav-btn.primary:hover { filter: drop-shadow(0 8px 22px rgba(255, 107, 53, 0.5)); }
         .nav-btn svg { width: 18px; height: 18px; }
         .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 

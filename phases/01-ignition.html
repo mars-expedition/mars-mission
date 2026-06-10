@@ -433,7 +433,7 @@ from agent_framework.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 
-INSTRUCCIONES = (
+INSTRUCTIONS = (
     "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
     "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso. "
     "Responde directamente, sin anteponer tu nombre ni etiquetas como 'MissionControl:'."
@@ -448,7 +448,7 @@ async def main() -> None:
     )
 
     # Crear el agente con su rol
-    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCTIONS)
 
     # Una consulta, una respuesta completa
     response = await mission_control.run("Control, solicito briefing del estado de la mision.")
@@ -534,7 +534,7 @@ from agent_framework.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 
-INSTRUCCIONES = (
+INSTRUCTIONS = (
     "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
     "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso. "
     "Responde directamente, sin anteponer tu nombre ni etiquetas como 'MissionControl:'."
@@ -546,7 +546,7 @@ async def main() -> None:
         model="gpt-4o-mini",
         api_key=os.getenv("OPENAI_API_KEY"),
     )
-    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCTIONS)
 
     # La respuesta llega token por token
     print("CONTROL: ", end="", flush=True)
@@ -601,7 +601,7 @@ from agent_framework.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 
-INSTRUCCIONES = (
+INSTRUCTIONS = (
     "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
     "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso. "
     "Responde directamente, sin anteponer tu nombre ni etiquetas como 'MissionControl:'."
@@ -613,7 +613,7 @@ async def main() -> None:
         model="gpt-4o-mini",
         api_key=os.getenv("OPENAI_API_KEY"),
     )
-    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCCIONES)
+    mission_control = client.as_agent(name="MissionControl", instructions=INSTRUCTIONS)
 
     # La sesion guarda la memoria de la conversacion
     session = mission_control.create_session()

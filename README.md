@@ -13,7 +13,7 @@ El código de los retos de cada fase vive en su propio repositorio:
 | # | Fase | Tema | Estado |
 |---|------|------|--------|
 | 01 | IGNITION | Fundamentos: primer agente, streaming y sesiones | ✅ |
-| 02 | LAUNCH | Tools y MCP | 🔒 |
+| 02 | LAUNCH | Tools y MCP | ✅ |
 | 03 | ORBIT | Sesiones y middleware | 🔒 |
 | 04 | TRANSIT | RAG y conocimiento | 🔒 |
 | 05 | APPROACH | Memoria persistente | 🔒 |

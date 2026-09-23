@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAUNCH - MISIÓN MARTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --bg-space: #0a0612;
+            --mars-orange: #ff6b35;
+            --mars-red: #ff3b30;
+            --mars-light: #ff9f68;
+            --mars-glow: #ffcba4;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.75);
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        details.free-option {
+            margin: 20px 0;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 0 20px;
+        }
+        details.free-option > summary {
+            cursor: pointer;
+            padding: 16px 0;
+            font-weight: 600;
+            color: var(--mars-light);
+            list-style: none;
+        }
+        details.free-option > summary::-webkit-details-marker { display: none; }
+        details.free-option > summary::before { content: "\25B8  "; color: var(--mars-orange); }
+        details.free-option[open] > summary::before { content: "\25BE  "; }
+        details.free-option[open] > summary {
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 14px;
+        }
+        details.free-option ol { padding-left: 20px; margin: 8px 0; }
+
+        .content-panel p a,
+        .content-panel li a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.45);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .content-panel p a:hover,
+        .content-panel li a:hover {
+            color: var(--mars-orange);
+            border-bottom-color: var(--mars-orange);
+        }
+
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--mars-light);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+        .copy-btn:hover { background: rgba(255, 107, 53, 0.3); }
+        .copy-btn.copied {
+            color: #7CFC98;
+            border-color: rgba(124, 252, 152, 0.5);
+            background: rgba(124, 252, 152, 0.12);
+            opacity: 1;
+        }
+
+        /* Instrucción pegada a su caja de comando */
+        .content-panel p:has(+ pre) {
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.92rem;
+        }
+        .content-panel p:has(+ pre) + pre {
+            margin-top: 0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: var(--bg-space);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 6, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ff9f68, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .nav-back {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none; font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-back:hover { color: var(--mars-orange); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 40px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 50px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .phase-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            padding: 10px 18px; border-radius: 100px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;
+            color: var(--mars-light); margin-bottom: 24px;
+        }
+        .phase-badge svg { width: 18px; height: 18px; }
+
+        .phase-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #ffcba4, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .phase-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem; font-weight: 600;
+            margin: 50px 0 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+            color: var(--mars-light);
+        }
+        h3 {
+            font-size: 1.1rem; font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--mars-orange);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin: 28px 0;
+        }
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            text-align: center;
+        }
+        .concept-card svg { width: 40px; height: 40px; margin-bottom: 12px; }
+        .concept-card h4 {
+            font-size: 1rem; color: var(--mars-orange); margin: 0 0 10px; font-weight: 600;
+        }
+        .concept-card p {
+            font-size: 0.85rem; margin: 0; line-height: 1.5;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 24px !important;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--mars-light);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, rgba(255,159,104,0.08), rgba(255,107,53,0.08));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 104, 0.25);
+            border-radius: 18px;
+            padding: 32px; margin: 50px 0;
+        }
+        .checkpoint h3 {
+            color: var(--mars-glow);
+            margin-top: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .checkpoint h3 svg { width: 24px; height: 24px; }
+        .checkpoint ul {
+            list-style: none; padding: 0;
+            margin-top: 16px;
+        }
+        .checkpoint li {
+            display: flex; align-items: center; gap: 12px;
+            margin: 12px 0; color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between;
+            margin-top: 50px; padding-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .nav-btn {
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            padding: 15px 26px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.74rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -130%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .nav-btn:hover::before { left: 150%; }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-btn:focus-visible { outline: 2px solid var(--mars-glow); outline-offset: 3px; }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
+            border: none;
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.35));
+        }
+        .nav-btn.primary:hover { filter: drop-shadow(0 8px 22px rgba(255, 107, 53, 0.5)); }
+        .nav-btn svg { width: 18px; height: 18px; }
+        .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        .simulation-note {
+            border-left: 3px solid var(--mars-orange);
+            background: rgba(255, 107, 53, 0.08);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 0 0 28px;
+        }
+        .guide-toc { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 32px; }
+        .guide-toc a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border: 1px solid var(--panel-border);
+            border-radius: 100px;
+            padding: 7px 13px;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+        }
+        .guide-toc a:hover, .guide-toc a:focus-visible {
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .content-panel h2[id], .checkpoint[id] { scroll-margin-top: 100px; }
+        .prompt-list { padding-left: 24px; margin: 12px 0 24px; color: var(--text-secondary); }
+        .prompt-list li { margin: 8px 0; }
+        .concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        @media (max-width: 600px) {
+            .concept-grid { grid-template-columns: 1fr; }
+            .copy-btn { opacity: 1; }
+        }
+        @media (hover: none) {
+            .copy-btn { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .page-content { padding: 100px 16px 40px; }
+            .content-panel { padding: 30px 24px; }
+            .phase-title { font-size: 1.6rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+            </svg>
+            MISIÓN MARTE
+        </a>
+        <a href="../index.html#expedicion" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver a la expedición
+        </a>
+    </nav>
+
+    <div class="page-content">
+        <div class="content-panel">
+            <div class="phase-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2L9 9h6L12 2Z"/>
+                    <path d="M12 9v11M8 22h8M7 17l5 5 5-5"/>
+                </svg>
+                FASE 02 · LAUNCH
+            </div>
+            <h1 class="phase-title">Lanzamiento: Tools y MCP</h1>
+            <p class="phase-description">
+                Amplía tu agente con funciones Python y con un servidor MCP local. Primero usarás
+                herramientas para responder preguntas de la misión; después conectarás una herramienta,
+                un recurso y un prompt de clima marciano.
+            </p>
+            <p class="simulation-note">
+                El plan de viaje, el inventario y el clima de estos ejercicios son datos simulados.
+                La hora procede del reloj del sistema y el cálculo de viaje es una estimación simplificada.
+            </p>
+
+            <nav class="guide-toc" aria-label="Contenido de la fase">
+                <a href="#preparacion">Preparación</a>
+                <a href="#herramientas">1 · Tools</a>
+                <a href="#servidor-mcp">2 · Servidor MCP</a>
+                <a href="#chat-mcp">3 · Chat MCP</a>
+                <a href="#checkpoint">Checkpoint</a>
+            </nav>
+
+            <h2 id="preparacion">Preparación</h2>
+            <p>
+                Necesitas <strong>Python 3.10 o posterior</strong>, <code>uv</code> y una clave de OpenAI.
+                Trabaja desde la raíz de <code>mars-mission-labs</code>.
+            </p>
+            <p>Copia <code>.env.example</code> a <code>.env</code> en esa raíz y configura:</p>
+            <pre><code class="language-bash">OPENAI_API_KEY=sk-tu-api-key-aqui</code></pre>
+            <p>
+                Cada archivo declara sus propias dependencias con metadatos PEP 723; <code>uv run</code>
+                prepara el entorno al ejecutarlo. Los ejemplos usan <code>gpt-4o-mini</code> mediante
+                <code>OpenAIChatCompletionClient</code>. No publiques tu archivo <code>.env</code>.
+            </p>
+
+            <h2>Conceptos clave</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="7" y="12" width="34" height="24" rx="5"/><path d="m14 22 5 4-5 4M24 30h10"/>
+                    </svg>
+                    <h4>Tool calling</h4>
+                    <p>El agente elige una función cuando necesita datos o un cálculo para responder.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c-7 9-7 25 0 34M24 7c7 9 7 25 0 34"/>
+                    </svg>
+                    <h4>Datos simulados</h4>
+                    <p>Algunas funciones devuelven una muestra local, sin consultar Internet ni una base real.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="6" y="14" width="14" height="20" rx="3"/><rect x="28" y="14" width="14" height="20" rx="3"/>
+                        <path d="M20 24h8M24 20l4 4-4 4"/>
+                    </svg>
+                    <h4>MCP</h4>
+                    <p>Un servidor publica herramientas, recursos y prompts mediante un protocolo común.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <path d="M8 14h14M26 14h14M8 34h14M26 34h14M24 8v32"/>
+                        <circle cx="24" cy="24" r="5" fill="rgba(255,107,53,0.2)"/>
+                    </svg>
+                    <h4>stdio</h4>
+                    <p>El chat inicia el servidor local como proceso y se comunica con él por entrada y salida estándar.</p>
+                </div>
+            </div>
+
+            <h2 id="herramientas">Paso 1 · Herramientas Python</h2>
+            <p>
+                <code>01_tools.py</code> registra cinco funciones directamente en
+                <code>client.as_agent(..., tools=[...])</code>. Sus nombres, parámetros y descripciones
+                ayudan al agente a escogerlas; este ejemplo no usa un decorador <code>@tool</code>.
+            </p>
+            <p>
+                <code>get_current_time</code> lee el reloj local y
+                <code>get_current_time_in_timezone</code> acepta una zona IANA, como
+                <code>America/Lima</code>. <code>web_search</code> y <code>query_database</code>
+                consultan muestras locales del plan y el inventario. <code>travel_time_calc</code>
+                divide distancia entre velocidad y convierte las horas a días; supone velocidad
+                constante y trayectoria directa. El script requiere <code>agent-framework-openai</code>,
+                <code>python-dotenv</code> y <code>tzdata</code>.
+            </p>
+            <p>Este es el archivo completo del laboratorio:</p>
+            <pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.10"
+# dependencies = [
+#     "agent-framework-openai",
+#     "python-dotenv",
+#     "tzdata",
+# ]
+# ///
+"""MISION MARTE - Fase 02: chat con herramientas locales y datos simulados."""
+
+import asyncio
+import os
+import unicodedata
+from datetime import datetime
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+from agent_framework.openai import OpenAIChatCompletionClient
+from dotenv import load_dotenv
+
+INSTRUCTIONS = (
+    "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
+    "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso. "
+    "Para consultar la hora actual, usa una de las herramientas disponibles. "
+    "Si el usuario indica una zona horaria, usa get_current_time_in_timezone con un nombre IANA, "
+    "por ejemplo America/Lima. Si pregunta por una respuesta anterior, usa la conversación "
+    "sin volver a consultar la hora. Usa web_search para consultar el plan de viaje simulado "
+    "a Marte, query_database para el inventario simulado de la misión y travel_time_calc "
+    "para estimar la duración del trayecto. Cuando respondas con resultados de web_search o "
+    "query_database, empieza la respuesta con 'Datos simulados:' y no inventes resultados "
+    "adicionales. El cálculo de viaje supone velocidad constante y trayectoria directa. "
+    "Responde directamente, sin anteponer tu nombre ni etiquetas."
+)
+SIMULATED_OXYGEN_TANKS_AVAILABLE = 28
+
+
+def normalize_text(value: str) -&gt; str:
+    """Quita diferencias de mayúsculas y acentos para comparar la muestra."""
+    return "".join(
+        character
+        for character in unicodedata.normalize("NFKD", value.casefold())
+        if not unicodedata.combining(character)
+    )
+
+
+def get_current_time() -&gt; str:
+    """Devuelve la hora actual en la zona horaria local del sistema."""
+    return datetime.now().astimezone().strftime("%H:%M:%S %Z")
+
+
+def get_current_time_in_timezone(timezone: str) -&gt; str:
+    """Devuelve la hora actual en una zona horaria IANA, como America/Lima."""
+    try:
+        current_time = datetime.now(ZoneInfo(timezone))
+    except (ZoneInfoNotFoundError, ValueError, TypeError):
+        return (
+            f"Zona horaria inválida: {timezone}. Usa un nombre IANA, como America/Lima."
+        )
+    return f"{current_time:%H:%M:%S} ({timezone})"
+
+
+def web_search(query: str) -&gt; str:
+    """Busca un plan de viaje a Marte en un índice local simulado."""
+    normalized_query = normalize_text(query)
+    if "marte" in normalized_query and any(
+        term in normalized_query
+        for term in ("plan", "ruta", "viaje", "trayecto", "itinerario")
+    ):
+        return (
+            "El plan de viaje de MISIÓN MARTE contempla lanzamiento "
+            "desde la Tierra, crucero interplanetario, inserción en órbita marciana "
+            "y descenso a la superficie."
+        )
+    return "No hay resultados para esa consulta en la muestra simulada."
+
+
+def query_database(table: str, item: str, status: str) -&gt; str:
+    """Consulta un inventario simulado de suministros de la misión."""
+    normalized_table, normalized_item, normalized_status = (
+        normalize_text(value.strip()) for value in (table, item, status)
+    )
+    if (
+        normalized_table in {"inventario", "suministros"}
+        and "oxigeno" in normalized_item
+        and normalized_status in {"disponible", "disponibles", "available"}
+    ):
+        return (
+            f"Hay {SIMULATED_OXYGEN_TANKS_AVAILABLE} tanques de oxígeno "
+            "disponibles en el inventario de MISIÓN MARTE."
+        )
+    return "No hay datos para esos filtros en la muestra simulada."
+
+
+def travel_time_calc(distance_km: float, speed_kmh: float) -&gt; str:
+    """Estima días de viaje con velocidad constante y trayectoria directa."""
+    if distance_km &lt;= 0 or speed_kmh &lt;= 0:
+        return "La distancia y la velocidad deben ser mayores que cero."
+    travel_days = distance_km / speed_kmh / 24
+    return (
+        f"Estimación simplificada: {travel_days:.2f} días de viaje. "
+        "Supone velocidad constante y trayectoria directa; no predice una misión real."
+    )
+
+
+async def main() -&gt; None:
+    """Inicia un chat que conserva la sesión y transmite las respuestas."""
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise SystemExit("Configura OPENAI_API_KEY en .env antes de iniciar el chat.")
+
+    client = OpenAIChatCompletionClient(model="gpt-4o-mini", api_key=api_key)
+    mission_control = client.as_agent(
+        name="MissionControl",
+        instructions=INSTRUCTIONS,
+        tools=[
+            get_current_time,
+            get_current_time_in_timezone,
+            web_search,
+            query_database,
+            travel_time_calc,
+        ],
+    )
+    session = mission_control.create_session()
+
+    print(
+        "Control de Misión en línea. Plan de vuelo e inventario simulados. "
+        "Escribe 'salir' para terminar.\n"
+    )
+    while True:
+        try:
+            user = input("Tú: ")
+        except (EOFError, KeyboardInterrupt):
+            print("\nCierre de comunicaciones. Cambio y fuera.")
+            break
+        if user.strip().lower() in {"salir", "exit", "quit"}:
+            print("Cierre de comunicaciones. Cambio y fuera.")
+            break
+
+        print("CONTROL: ", end="", flush=True)
+        async for chunk in mission_control.run(user, session=session, stream=True):
+            if chunk.text:
+                print(chunk.text, end="", flush=True)
+        print("\n")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+</code></pre>
+            <p>Ejecuta desde la raíz de <code>mars-mission-labs</code>:</p>
+            <pre><code class="language-bash">uv run phases/02-launch/01_tools.py</code></pre>
+            <p>Prueba estas preguntas en el chat:</p>
+            <ul class="prompt-list">
+                <li>¿Qué hora es en Perú?</li>
+                <li>Busca el plan de viaje de MISIÓN MARTE.</li>
+                <li>¿Cuántos tanques de oxígeno hay disponibles en el inventario?</li>
+                <li>Si recorremos 225 000 000 km a 50 000 km/h, ¿cuántos días tomaría el viaje?</li>
+            </ul>
+            <p>
+                La muestra del inventario contiene <strong>28 tanques</strong>; la estimación del
+                último ejemplo es <strong>187,50 días</strong>. La respuesta del modelo puede variar,
+                pero esos datos proceden de las funciones. Escribe <code>salir</code> para terminar.
+            </p>
+
+            <h2 id="servidor-mcp">Paso 2 · Servidor MCP de clima</h2>
+            <p>
+                <code>02_mcp_server.py</code> crea un servidor <code>FastMCP</code> local y publica
+                <code>get_mars_weather</code> como herramienta, <code>mars://weather-thresholds</code>
+                como recurso y <code>mars_weather_briefing</code> como prompt. Depende de
+                <code>mcp&gt;=1.27,&lt;2</code> y usa el transporte <code>stdio</code>.
+            </p>
+            <p>
+                El riesgo es alto si la visibilidad es <code>Poor</code> o la temperatura es
+                ≤ −70 °C; si no, es medio cuando el viento supera 20 km/h. En los demás casos
+                es bajo. La muestra fija de −63 °C, 24 km/h y visibilidad <code>Good</code>
+                produce <strong>riesgo medio</strong>. No representa el clima actual de Marte.
+            </p>
+            <p>Este es el archivo completo del servidor:</p>
+            <pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.10"
+# dependencies = [
+#     "mcp&gt;=1.27,&lt;2",
+# ]
+# ///
+"""MISION MARTE - Fase 02: servidor MCP de clima marciano simulado."""
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("MarsWeather", log_level="WARNING")
+HIGH_RISK_TEMPERATURE_C = -70
+MEDIUM_RISK_WIND_KMH = 20
+
+
+def classify_mars_weather(
+    temperature_c: int, wind_speed_kmh: int, visibility: str
+) -&gt; tuple[str, str]:
+    """Clasifica el clima de forma determinista según los umbrales publicados."""
+    if visibility == "Poor":
+        return "Alto", "Visibilidad deficiente."
+    if temperature_c &lt;= HIGH_RISK_TEMPERATURE_C:
+        return "Alto", (
+            f"Temperatura de {temperature_c} °C, igual o menor a "
+            f"{HIGH_RISK_TEMPERATURE_C} °C."
+        )
+    if wind_speed_kmh &gt; MEDIUM_RISK_WIND_KMH:
+        return "Medio", (
+            f"Viento de {wind_speed_kmh} km/h, mayor a {MEDIUM_RISK_WIND_KMH} km/h."
+        )
+    return "Bajo", "Condiciones dentro de los umbrales de riesgo bajo."
+
+
+@mcp.tool()
+def get_mars_weather() -&gt; dict[str, int | str | bool]:
+    """Devuelve una muestra simulada del clima en Marte; no son datos actuales."""
+    temperature_c = -63
+    wind_speed_kmh = 24
+    visibility = "Good"
+    risk_level, risk_reason = classify_mars_weather(
+        temperature_c, wind_speed_kmh, visibility
+    )
+    return {
+        "temperature_c": temperature_c,
+        "wind_speed_kmh": wind_speed_kmh,
+        "visibility": visibility,
+        "risk_level": risk_level,
+        "risk_reason": risk_reason,
+        "simulated": True,
+    }
+
+
+@mcp.resource("mars://weather-thresholds")
+def mars_weather_thresholds() -&gt; str:
+    """Expone los criterios de riesgo para el briefing de clima marciano."""
+    return (
+        "Clasifica el riesgo de la muestra en este orden:\n"
+        f"Alto: visibilidad Poor o temperatura menor o igual a {HIGH_RISK_TEMPERATURE_C} °C.\n"
+        f"Medio: viento mayor a {MEDIUM_RISK_WIND_KMH} km/h.\n"
+        "Bajo: cualquier otro caso."
+    )
+
+
+@mcp.prompt()
+def mars_weather_briefing() -&gt; str:
+    """Prepara el formato del informe de clima para Control de Misión."""
+    return (
+        "Actúa como Control de Misión. Cuando pregunten por el clima en Marte, "
+        "consulta get_mars_weather. La herramienta ya aplicó los umbrales del recurso: "
+        "usa risk_level y risk_reason sin volver a calcularlos. "
+        "Indica explícitamente que los datos son simulados. Responde en tres líneas: "
+        "Estado actual, Nivel de riesgo y Recomendación operacional."
+    )
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
+</code></pre>
+            <p>
+                El siguiente paso inicia este servidor automáticamente; no necesitas abrirlo
+                en otra terminal.
+            </p>
+
+            <h2 id="chat-mcp">Paso 3 · Chat con MCP</h2>
+            <p>
+                <code>03_mcp_chat.py</code> inicia el servidor por <code>stdio</code>, lee su recurso
+                y su prompt, y los incorpora a las instrucciones del agente. Luego
+                <code>MCPStdioTool</code> le da acceso a la herramienta de clima. La sesión conserva
+                el contexto entre preguntas. Este archivo declara <code>agent-framework-openai</code>,
+                <code>mcp&gt;=1.27,&lt;2</code>, <code>pydantic&gt;=2,&lt;3</code> y
+                <code>python-dotenv</code>.
+            </p>
+            <p>Este es el archivo completo del cliente:</p>
+            <pre><code class="language-python"># /// script
+# requires-python = "&gt;=3.10"
+# dependencies = [
+#     "agent-framework-openai",
+#     "mcp&gt;=1.27,&lt;2",
+#     "pydantic&gt;=2,&lt;3",
+#     "python-dotenv",
+# ]
+# ///
+"""MISION MARTE - Fase 02: chat con un servidor MCP local."""
+
+import asyncio
+import os
+import sys
+from pathlib import Path
+
+from agent_framework import MCPStdioTool
+from agent_framework.openai import OpenAIChatCompletionClient
+from dotenv import load_dotenv
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+from mcp.types import TextContent, TextResourceContents
+from pydantic import AnyUrl
+
+SERVER_PATH = Path(__file__).resolve().with_name("02_mcp_server.py")
+INSTRUCTIONS = (
+    "Eres el Control de Mision de MISION MARTE. Coordinas la mision a Marte "
+    "y das briefings tecnicos a la tripulacion. Usa terminologia espacial y se conciso. "
+    "Responde directamente, sin anteponer tu nombre ni etiquetas como 'MissionControl:'."
+)
+
+
+async def load_mcp_context() -&gt; tuple[str, str]:
+    """Lee el recurso y el prompt que el servidor MCP publica."""
+    server = StdioServerParameters(command=sys.executable, args=[str(SERVER_PATH)])
+    async with (
+        stdio_client(server) as (read_stream, write_stream),
+        ClientSession(read_stream, write_stream) as session,
+    ):
+        await session.initialize()
+        resource = await session.read_resource(AnyUrl("mars://weather-thresholds"))
+        prompt = await session.get_prompt("mars_weather_briefing")
+
+    thresholds = "\n".join(
+        item.text
+        for item in resource.contents
+        if isinstance(item, TextResourceContents)
+    )
+    briefing = "\n".join(
+        message.content.text
+        for message in prompt.messages
+        if isinstance(message.content, TextContent)
+    )
+    if not thresholds or not briefing:
+        raise RuntimeError(
+            "El servidor MCP no devolvió el recurso o el prompt de clima."
+        )
+    return thresholds, briefing
+
+
+async def main() -&gt; None:
+    """Inicia un chat con contexto MCP y acceso a la tool de clima."""
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise SystemExit("Configura OPENAI_API_KEY en .env antes de iniciar el chat.")
+
+    thresholds, briefing = await load_mcp_context()
+    client = OpenAIChatCompletionClient(model="gpt-4o-mini", api_key=api_key)
+    instructions = f"{INSTRUCTIONS}\n\n{thresholds}\n\n{briefing}"
+
+    async with MCPStdioTool(
+        name="MarsWeather",
+        command=sys.executable,
+        args=[str(SERVER_PATH)],
+        load_prompts=False,
+    ) as weather_tool:
+        mission_control = client.as_agent(
+            name="MissionControl",
+            instructions=instructions,
+            tools=weather_tool,
+        )
+        session = mission_control.create_session()
+
+        print(
+            "Control de Misión en línea. Clima marciano simulado. Escribe 'salir' para terminar.\n"
+        )
+        while True:
+            try:
+                user = input("Tú: ")
+            except (EOFError, KeyboardInterrupt):
+                print("\nCierre de comunicaciones. Cambio y fuera.")
+                break
+            if user.strip().lower() in {"salir", "exit", "quit"}:
+                print("Cierre de comunicaciones. Cambio y fuera.")
+                break
+
+            print("CONTROL: ", end="", flush=True)
+            async for chunk in mission_control.run(user, session=session, stream=True):
+                if chunk.text:
+                    print(chunk.text, end="", flush=True)
+            print("\n")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+</code></pre>
+            <p>Ejecuta desde la raíz de <code>mars-mission-labs</code>:</p>
+            <pre><code class="language-bash">uv run phases/02-launch/03_mcp_chat.py</code></pre>
+            <p>Pregunta <code>¿Cómo está el clima en Marte?</code> y después
+                <code>¿Cuál fue el nivel de riesgo que reportaste?</code>. El briefing debe
+                aclarar que los datos son simulados. Escribe <code>salir</code> para cerrar el chat.
+            </p>
+
+            <div class="checkpoint" id="checkpoint">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Checkpoint: LAUNCH completo
+                </h3>
+                <p>Antes de avanzar, verifica que puedes:</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Registrar funciones Python con <code>tools=[...]</code> y probar sus resultados.</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Distinguir la hora real de los datos simulados y del cálculo simplificado.</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Identificar la herramienta, el recurso y el prompt del servidor MCP.</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Ejecutar el chat MCP y hacer una pregunta de seguimiento en la misma sesión.</li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="01-ignition.html" class="nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver a IGNITION
+                </a>
+                <span class="nav-btn primary disabled">
+                    Próximamente: ORBIT
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Estrellas animadas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.85 ? `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : '#ffffff'
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * star.twinkleSpeed) * 0.01;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color === '#ffffff' ?
+                    `rgba(255, 255, 255, ${star.opacity})` : star.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => { resizeCanvas(); animate(); });
+
+        // Botón "Copiar" en cada bloque de código
+        document.querySelectorAll('pre').forEach((pre) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.type = 'button';
+            btn.textContent = 'Copiar';
+            btn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code ? code.innerText : pre.innerText).replace(/\s+$/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = '¡Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copiar';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+            pre.appendChild(btn);
+        });
+    </script>
+</body>
+</html>

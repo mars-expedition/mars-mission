@@ -781,6 +781,10 @@
             border-color: rgba(255, 107, 53, 0.3);
             transform: translateX(8px);
         }
+        .phase-content:focus-visible {
+            outline: 2px solid var(--mars-glow);
+            outline-offset: 4px;
+        }
 
         .phase-content.disabled {
             opacity: 0.5;
@@ -1380,7 +1384,7 @@
                     <div class="phase-marker">
                         <div class="phase-number">02</div>
                     </div>
-                    <div class="phase-content disabled">
+                    <a href="phases/02-launch.html" class="phase-content">
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Launch icon -->
@@ -1417,20 +1421,19 @@
                                 <circle cx="118" cy="20" r="3.5" fill="none" stroke="#ffcba4" stroke-width="2"/>
                             </g>
                             <rect class="s-chip" x="100" y="86" width="44" height="16" rx="5"/>
-                            <text x="106" y="97">@tool</text>
+                            <text x="106" y="97">tools=</text>
                         </svg>
-                        <h3 class="phase-title">Lanzamiento: Tools y Capacidades</h3>
+                        <h3 class="phase-title">Lanzamiento: Tools y MCP</h3>
                         <p class="phase-description">
-                            La nave se eleva. Equipa a tu agente con herramientas usando <code>@tool</code> 
-                            y conecta fuentes externas con MCP.
+                            La nave se eleva. Equipa a tu agente con funciones Python mediante <code>tools=[...]</code>
+                            y consulta un servidor MCP local de clima marciano simulado.
                         </p>
                         <div class="phase-tags">
-                            <span class="tag">@tool</span>
-                            <span class="tag">Annotated</span>
+                            <span class="tag">Tools</span>
+                            <span class="tag">Funciones Python</span>
                             <span class="tag">MCP</span>
-                            <span class="tag tag-soon">Señal pendiente</span>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- Phase 3 -->

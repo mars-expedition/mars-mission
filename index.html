@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MISIÓN MARTE - El desafío del hombre rumbo a Marte</title>
-    <meta name="description" content="Bootcamp de Microsoft Agent Framework. Domina agentes autónomos construyendo sistemas que conquistan el planeta rojo.">
+    <meta name="description"
+        content="Bootcamp de Microsoft Agent Framework. Domina agentes autónomos construyendo sistemas que conquistan el planeta rojo.">
     <meta name="theme-color" content="#0a0612">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
     <style>
         :root {
             --bg-space: #0a0612;
@@ -20,17 +24,24 @@
             --mars-glow: #ffcba4;
             --earth-blue: #4a90d9;
             --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.75);
-            --text-muted: rgba(255,255,255,0.5);
+            --text-secondary: rgba(255, 255, 255, 0.75);
+            --text-muted: rgba(255, 255, 255, 0.5);
             --panel-bg: rgba(255, 255, 255, 0.045);
             --panel-border: rgba(255, 255, 255, 0.1);
             --card-bg: rgba(255, 255, 255, 0.03);
             --card-border: rgba(255, 255, 255, 0.06);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Titillium Web', -apple-system, sans-serif;
             background: var(--bg-space);
@@ -44,8 +55,10 @@
         ============================================ */
         #stars-canvas {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
             pointer-events: none;
         }
@@ -55,7 +68,10 @@
         ============================================ */
         .floating-illustrations {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
@@ -103,33 +119,72 @@
         }
 
         @keyframes float-slow {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(1deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(1deg);
+            }
         }
 
         @keyframes rocket-float {
-            0%, 100% { transform: translateY(0) rotate(-12deg); }
-            50% { transform: translateY(-25px) rotate(-8deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-12deg);
+            }
+
+            50% {
+                transform: translateY(-25px) rotate(-8deg);
+            }
         }
 
         @keyframes astronaut-float {
-            0%, 100% { transform: translateY(0) rotate(3deg); }
-            33% { transform: translateY(-12px) rotate(-2deg); }
-            66% { transform: translateY(8px) rotate(5deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(3deg);
+            }
+
+            33% {
+                transform: translateY(-12px) rotate(-2deg);
+            }
+
+            66% {
+                transform: translateY(8px) rotate(5deg);
+            }
         }
 
         @keyframes rover-move {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(25px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(25px);
+            }
         }
 
         /* Parallax: la propiedad translate compone con las animaciones transform */
-        .illustration { translate: 0 var(--p, 0px); }
+        .illustration {
+            translate: 0 var(--p, 0px);
+        }
 
         /* ============================================
            RUTA DE FONDO TIERRA→MARTE (hero/global)
         ============================================ */
-        .bg-route { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .bg-route {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         .bg-route .bg-route-path {
             fill: none;
             stroke: rgba(255, 159, 104, 0.35);
@@ -137,9 +192,15 @@
             stroke-dasharray: 3 9;
             animation: route-drift 30s linear infinite;
         }
-        .bg-route .bg-ship { opacity: 0.9; }
+
+        .bg-route .bg-ship {
+            opacity: 0.9;
+        }
+
         @keyframes route-drift {
-            to { stroke-dashoffset: -240; }
+            to {
+                stroke-dashoffset: -240;
+            }
         }
 
         /* ============================================
@@ -161,7 +222,11 @@
             pointer-events: none;
             transition: opacity 0.4s ease;
         }
-        .telemetry.on { opacity: 1; }
+
+        .telemetry.on {
+            opacity: 1;
+        }
+
         .tele-label {
             font-family: 'Orbitron', monospace;
             font-size: 0.55rem;
@@ -172,15 +237,23 @@
             align-items: center;
             gap: 6px;
         }
+
         .tele-label::before {
             content: '';
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #7CFC98;
             box-shadow: 0 0 8px rgba(124, 252, 152, 0.8);
             animation: tele-blink 2s ease-in-out infinite;
         }
-        @keyframes tele-blink { 50% { opacity: 0.3; } }
+
+        @keyframes tele-blink {
+            50% {
+                opacity: 0.3;
+            }
+        }
+
         .tele-phase {
             font-family: 'Orbitron', monospace;
             font-size: 0.62rem;
@@ -190,6 +263,7 @@
             margin-bottom: 10px;
             min-height: 2em;
         }
+
         .tele-bar {
             height: 4px;
             border-radius: 4px;
@@ -197,6 +271,7 @@
             overflow: hidden;
             margin-bottom: 8px;
         }
+
         .tele-fill {
             height: 100%;
             width: 0%;
@@ -204,17 +279,25 @@
             background: linear-gradient(90deg, #ffcba4, var(--mars-orange));
             transition: width 0.2s linear;
         }
+
         .tele-pct {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.62rem;
             color: var(--text-secondary);
         }
-        @media (max-width: 1100px) { .telemetry { display: none; } }
+
+        @media (max-width: 1100px) {
+            .telemetry {
+                display: none;
+            }
+        }
 
         /* ============================================
            TRAYECTORIA DE LA EXPEDICIÓN (timeline)
         ============================================ */
-        .timeline::before { display: none; }
+        .timeline::before {
+            display: none;
+        }
 
         .route-svg {
             position: absolute;
@@ -224,12 +307,14 @@
             overflow: visible;
             pointer-events: none;
         }
+
         .route-base {
             fill: none;
             stroke: rgba(255, 159, 104, 0.28);
             stroke-width: 2;
             stroke-dasharray: 4 8;
         }
+
         .route-progress {
             fill: none;
             stroke: url(#routeGrad);
@@ -237,24 +322,54 @@
             stroke-linecap: round;
             filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.5));
         }
+
         .route-endpoint text {
             font-family: 'Orbitron', monospace;
             font-size: 8px;
             letter-spacing: 2px;
             fill: var(--text-muted);
         }
-        .route-ship { filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.7)); }
+
+        .route-ship {
+            filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.7));
+        }
 
         /* Marcadores en onda: la ruta se curva entre fases */
-        .phase-marker { transform: translateX(var(--mx, 0px)); }
-        .phase:nth-of-type(1) .phase-marker { --mx: 0px; }
-        .phase:nth-of-type(2) .phase-marker { --mx: -22px; }
-        .phase:nth-of-type(3) .phase-marker { --mx: -34px; }
-        .phase:nth-of-type(4) .phase-marker { --mx: -20px; }
-        .phase:nth-of-type(5) .phase-marker { --mx: -2px; }
-        .phase:nth-of-type(6) .phase-marker { --mx: -26px; }
-        .phase:nth-of-type(7) .phase-marker { --mx: -12px; }
-        .phase:nth-of-type(8) .phase-marker { --mx: 0px; }
+        .phase-marker {
+            transform: translateX(var(--mx, 0px));
+        }
+
+        .phase:nth-of-type(1) .phase-marker {
+            --mx: 0px;
+        }
+
+        .phase:nth-of-type(2) .phase-marker {
+            --mx: -22px;
+        }
+
+        .phase:nth-of-type(3) .phase-marker {
+            --mx: -34px;
+        }
+
+        .phase:nth-of-type(4) .phase-marker {
+            --mx: -20px;
+        }
+
+        .phase:nth-of-type(5) .phase-marker {
+            --mx: -2px;
+        }
+
+        .phase:nth-of-type(6) .phase-marker {
+            --mx: -26px;
+        }
+
+        .phase:nth-of-type(7) .phase-marker {
+            --mx: -12px;
+        }
+
+        .phase:nth-of-type(8) .phase-marker {
+            --mx: 0px;
+        }
 
         .phase-number.reached {
             background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
@@ -270,10 +385,14 @@
             grid-template-columns: 1fr auto;
             column-gap: 24px;
         }
-        .timeline .phase-content > .phase-header,
-        .timeline .phase-content > .phase-title,
-        .timeline .phase-content > .phase-description,
-        .timeline .phase-content > .phase-tags { grid-column: 1; }
+
+        .timeline .phase-content>.phase-header,
+        .timeline .phase-content>.phase-title,
+        .timeline .phase-content>.phase-description,
+        .timeline .phase-content>.phase-tags {
+            grid-column: 1;
+        }
+
         .phase-scene {
             grid-column: 2;
             grid-row: 1 / 5;
@@ -281,33 +400,124 @@
             width: 158px;
             height: 116px;
         }
+
         .phase-scene text {
             font-family: 'JetBrains Mono', monospace;
             font-size: 9px;
             fill: var(--mars-glow);
         }
-        .s-chip { fill: rgba(255, 107, 53, 0.16); stroke: rgba(255, 107, 53, 0.45); }
+
+        .s-chip {
+            fill: rgba(255, 107, 53, 0.16);
+            stroke: rgba(255, 107, 53, 0.45);
+        }
 
         /* Micro-animaciones de escena */
-        .s-flame { transform-origin: center top; transform-box: fill-box; animation: s-flicker 0.5s ease-in-out infinite; }
-        @keyframes s-flicker { 50% { transform: scaleY(1.25); } }
-        .s-pulse { transform-origin: center; transform-box: fill-box; animation: s-pulse 2.4s ease-in-out infinite; }
-        @keyframes s-pulse { 50% { transform: scale(1.12); opacity: 0.55; } }
-        .s-orbiter { transform-origin: 62px 56px; animation: s-orbit 10s linear infinite; }
-        @keyframes s-orbit { to { transform: rotate(360deg); } }
-        .s-dash { stroke-dasharray: 4 6; animation: s-dashmove 1.2s linear infinite; }
-        @keyframes s-dashmove { to { stroke-dashoffset: -20; } }
-        .s-bob { animation: s-bob 3s ease-in-out infinite; }
-        @keyframes s-bob { 50% { transform: translateY(-4px); } }
-        .s-pkt { offset-rotate: 0deg; animation: s-travel 5s linear infinite; }
-        .s-pkt.d1 { animation-delay: -1.6s; }
-        .s-pkt.d2 { animation-delay: -3.3s; }
-        @keyframes s-travel { from { offset-distance: 0%; } to { offset-distance: 100%; } }
-        .s-bar { transform-origin: center bottom; transform-box: fill-box; animation: s-grow 1.8s ease-in-out infinite alternate; }
-        .s-bar.d1 { animation-delay: 0.4s; }
-        .s-bar.d2 { animation-delay: 0.9s; }
-        .s-flag { transform-origin: left center; transform-box: fill-box; animation: s-wave 2.5s ease-in-out infinite; }
-        @keyframes s-wave { 50% { transform: skewY(-6deg); } }
+        .s-flame {
+            transform-origin: center top;
+            transform-box: fill-box;
+            animation: s-flicker 0.5s ease-in-out infinite;
+        }
+
+        @keyframes s-flicker {
+            50% {
+                transform: scaleY(1.25);
+            }
+        }
+
+        .s-pulse {
+            transform-origin: center;
+            transform-box: fill-box;
+            animation: s-pulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes s-pulse {
+            50% {
+                transform: scale(1.12);
+                opacity: 0.55;
+            }
+        }
+
+        .s-orbiter {
+            transform-origin: 62px 56px;
+            animation: s-orbit 10s linear infinite;
+        }
+
+        @keyframes s-orbit {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .s-dash {
+            stroke-dasharray: 4 6;
+            animation: s-dashmove 1.2s linear infinite;
+        }
+
+        @keyframes s-dashmove {
+            to {
+                stroke-dashoffset: -20;
+            }
+        }
+
+        .s-bob {
+            animation: s-bob 3s ease-in-out infinite;
+        }
+
+        @keyframes s-bob {
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .s-pkt {
+            offset-rotate: 0deg;
+            animation: s-travel 5s linear infinite;
+        }
+
+        .s-pkt.d1 {
+            animation-delay: -1.6s;
+        }
+
+        .s-pkt.d2 {
+            animation-delay: -3.3s;
+        }
+
+        @keyframes s-travel {
+            from {
+                offset-distance: 0%;
+            }
+
+            to {
+                offset-distance: 100%;
+            }
+        }
+
+        .s-bar {
+            transform-origin: center bottom;
+            transform-box: fill-box;
+            animation: s-grow 1.8s ease-in-out infinite alternate;
+        }
+
+        .s-bar.d1 {
+            animation-delay: 0.4s;
+        }
+
+        .s-bar.d2 {
+            animation-delay: 0.9s;
+        }
+
+        .s-flag {
+            transform-origin: left center;
+            transform-box: fill-box;
+            animation: s-wave 2.5s ease-in-out infinite;
+        }
+
+        @keyframes s-wave {
+            50% {
+                transform: skewY(-6deg);
+            }
+        }
 
         /* ============================================
            SECTOR INEXPLORADO (fases bloqueadas)
@@ -319,19 +529,24 @@
             filter: saturate(0.35);
             overflow: hidden;
         }
+
         .phase-content.disabled::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent 0 3px,
-                rgba(255, 159, 104, 0.04) 3px 4px
-            );
+            background: repeating-linear-gradient(0deg,
+                    transparent 0 3px,
+                    rgba(255, 159, 104, 0.04) 3px 4px);
             animation: sector-static 9s linear infinite;
             pointer-events: none;
         }
-        @keyframes sector-static { to { background-position: 0 90px; } }
+
+        @keyframes sector-static {
+            to {
+                background-position: 0 90px;
+            }
+        }
+
         .phase-content.disabled::after {
             content: 'SECTOR INEXPLORADO';
             position: absolute;
@@ -346,10 +561,12 @@
             padding: 3px 44px;
             pointer-events: none;
         }
+
         .tag-soon::before {
             content: '';
             display: inline-block;
-            width: 5px; height: 5px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: var(--mars-light);
             margin-right: 5px;
@@ -361,13 +578,20 @@
            MOVIMIENTO REDUCIDO
         ============================================ */
         @media (prefers-reduced-motion: reduce) {
+
             .illustration,
             .bg-route .bg-route-path,
             .phase-content.disabled::before,
             .tele-label::before,
             .tag-soon::before,
-            .s-flame, .s-pulse, .s-orbiter, .s-dash,
-            .s-bob, .s-pkt, .s-bar, .s-flag {
+            .s-flame,
+            .s-pulse,
+            .s-orbiter,
+            .s-dash,
+            .s-bob,
+            .s-pkt,
+            .s-bar,
+            .s-flag {
                 animation: none !important;
             }
         }
@@ -377,7 +601,9 @@
         ============================================ */
         .nav {
             position: fixed;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
             padding: 16px 40px;
             display: flex;
@@ -490,7 +716,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 59, 48, 0.15));
             border: 1px solid rgba(255, 107, 53, 0.35);
             padding: 10px 20px;
             border-radius: 100px;
@@ -574,9 +800,12 @@
             transition: left 0.5s ease;
             pointer-events: none;
         }
+
         .btn-primary:hover::before,
         .btn-secondary:hover::before,
-        .nav-cta:hover::before { left: 150%; }
+        .nav-cta:hover::before {
+            left: 150%;
+        }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
@@ -591,7 +820,9 @@
 
         .btn-primary:active,
         .btn-secondary:active,
-        .nav-cta:active { transform: translateY(-1px) scale(0.98); }
+        .nav-cta:active {
+            transform: translateY(-1px) scale(0.98);
+        }
 
         .btn-primary:focus-visible,
         .btn-secondary:focus-visible,
@@ -781,6 +1012,7 @@
             border-color: rgba(255, 107, 53, 0.3);
             transform: translateX(8px);
         }
+
         .phase-content:focus-visible {
             outline: 2px solid var(--mars-glow);
             outline-offset: 4px;
@@ -982,23 +1214,60 @@
            RESPONSIVE
         ============================================ */
         @media (max-width: 768px) {
-            .nav { padding: 14px 20px; }
-            .nav-links { display: none; }
-            .nav-cta { display: none; }
-            
-            .main-content { padding: 100px 16px 40px; }
-            .central-panel { padding: 30px 24px; }
-            .section { padding: 40px 16px; }
-            .section-panel { padding: 30px 24px; }
-            
-            .floating-illustrations { display: none; }
-            
-            .timeline { padding-left: 55px; }
-            .timeline::before { left: 20px; }
-            .phase-marker { left: -55px; }
-            .phase-number { width: 44px; height: 44px; font-size: 0.85rem; }
+            .nav {
+                padding: 14px 20px;
+            }
 
-            .footer-links { flex-direction: column; gap: 16px; }
+            .nav-links {
+                display: none;
+            }
+
+            .nav-cta {
+                display: none;
+            }
+
+            .main-content {
+                padding: 100px 16px 40px;
+            }
+
+            .central-panel {
+                padding: 30px 24px;
+            }
+
+            .section {
+                padding: 40px 16px;
+            }
+
+            .section-panel {
+                padding: 30px 24px;
+            }
+
+            .floating-illustrations {
+                display: none;
+            }
+
+            .timeline {
+                padding-left: 55px;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .phase-marker {
+                left: -55px;
+            }
+
+            .phase-number {
+                width: 44px;
+                height: 44px;
+                font-size: 0.85rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 16px;
+            }
 
             /* Hero compacto, sin desbordes */
             .hero-badge {
@@ -1008,16 +1277,36 @@
                 font-size: 0.6rem;
                 letter-spacing: 1.5px;
             }
-            .hero-title { font-size: clamp(1.9rem, 10vw, 2.5rem); }
-            .hero-subtitle { font-size: 0.68rem; letter-spacing: 2px; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+
+            .hero-title {
+                font-size: clamp(1.9rem, 10vw, 2.5rem);
+            }
+
+            .hero-subtitle {
+                font-size: 0.68rem;
+                letter-spacing: 2px;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
 
             /* Ruta recta y sin etiquetas de planetas */
-            .phase-marker { --mx: 0px !important; }
-            .route-endpoint text { display: none; }
+            .phase-marker {
+                --mx: 0px !important;
+            }
+
+            .route-endpoint text {
+                display: none;
+            }
 
             /* Escena a ancho completo bajo el texto */
-            .timeline .phase-content { grid-template-columns: 1fr; }
+            .timeline .phase-content {
+                grid-template-columns: 1fr;
+            }
+
             .phase-scene {
                 grid-column: 1;
                 grid-row: auto;
@@ -1029,6 +1318,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Canvas de estrellas animadas -->
     <canvas id="stars-canvas"></canvas>
@@ -1039,110 +1329,110 @@
         <svg class="illustration mars-planet" data-depth="0.04" viewBox="0 0 200 200">
             <defs>
                 <radialGradient id="marsGradient" cx="30%" cy="30%">
-                    <stop offset="0%" stop-color="#ff8c5a"/>
-                    <stop offset="30%" stop-color="#ff6b35"/>
-                    <stop offset="60%" stop-color="#e84118"/>
-                    <stop offset="85%" stop-color="#8b1a1a"/>
-                    <stop offset="100%" stop-color="#3d0c0c"/>
+                    <stop offset="0%" stop-color="#ff8c5a" />
+                    <stop offset="30%" stop-color="#ff6b35" />
+                    <stop offset="60%" stop-color="#e84118" />
+                    <stop offset="85%" stop-color="#8b1a1a" />
+                    <stop offset="100%" stop-color="#3d0c0c" />
                 </radialGradient>
                 <radialGradient id="marsHighlight" cx="25%" cy="25%">
-                    <stop offset="0%" stop-color="rgba(255,200,180,0.25)"/>
-                    <stop offset="100%" stop-color="transparent"/>
+                    <stop offset="0%" stop-color="rgba(255,200,180,0.25)" />
+                    <stop offset="100%" stop-color="transparent" />
                 </radialGradient>
             </defs>
-            <circle cx="100" cy="100" r="95" fill="url(#marsGradient)"/>
-            <circle cx="100" cy="100" r="95" fill="url(#marsHighlight)"/>
-            <ellipse cx="65" cy="75" rx="18" ry="14" fill="rgba(100,30,20,0.3)"/>
-            <ellipse cx="130" cy="105" rx="22" ry="16" fill="rgba(80,25,15,0.25)"/>
-            <ellipse cx="85" cy="140" rx="14" ry="11" fill="rgba(90,28,18,0.2)"/>
-            <ellipse cx="100" cy="18" rx="40" ry="14" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="100" cy="100" r="95" fill="url(#marsGradient)" />
+            <circle cx="100" cy="100" r="95" fill="url(#marsHighlight)" />
+            <ellipse cx="65" cy="75" rx="18" ry="14" fill="rgba(100,30,20,0.3)" />
+            <ellipse cx="130" cy="105" rx="22" ry="16" fill="rgba(80,25,15,0.25)" />
+            <ellipse cx="85" cy="140" rx="14" ry="11" fill="rgba(90,28,18,0.2)" />
+            <ellipse cx="100" cy="18" rx="40" ry="14" fill="rgba(255,255,255,0.12)" />
         </svg>
 
         <!-- Planeta Tierra -->
         <svg class="illustration earth-planet" data-depth="0.07" viewBox="0 0 200 200">
             <defs>
                 <radialGradient id="earthGradient" cx="35%" cy="35%">
-                    <stop offset="0%" stop-color="#87CEEB"/>
-                    <stop offset="40%" stop-color="#4a90d9"/>
-                    <stop offset="70%" stop-color="#1e5799"/>
-                    <stop offset="100%" stop-color="#0a2d4d"/>
+                    <stop offset="0%" stop-color="#87CEEB" />
+                    <stop offset="40%" stop-color="#4a90d9" />
+                    <stop offset="70%" stop-color="#1e5799" />
+                    <stop offset="100%" stop-color="#0a2d4d" />
                 </radialGradient>
             </defs>
-            <circle cx="100" cy="100" r="95" fill="url(#earthGradient)"/>
-            <ellipse cx="75" cy="65" rx="28" ry="22" fill="rgba(76,175,80,0.5)"/>
-            <ellipse cx="135" cy="90" rx="22" ry="32" fill="rgba(76,175,80,0.4)"/>
-            <ellipse cx="65" cy="130" rx="32" ry="16" fill="rgba(76,175,80,0.45)"/>
-            <ellipse cx="55" cy="45" rx="22" ry="9" fill="rgba(255,255,255,0.35)"/>
-            <ellipse cx="145" cy="120" rx="28" ry="11" fill="rgba(255,255,255,0.3)"/>
+            <circle cx="100" cy="100" r="95" fill="url(#earthGradient)" />
+            <ellipse cx="75" cy="65" rx="28" ry="22" fill="rgba(76,175,80,0.5)" />
+            <ellipse cx="135" cy="90" rx="22" ry="32" fill="rgba(76,175,80,0.4)" />
+            <ellipse cx="65" cy="130" rx="32" ry="16" fill="rgba(76,175,80,0.45)" />
+            <ellipse cx="55" cy="45" rx="22" ry="9" fill="rgba(255,255,255,0.35)" />
+            <ellipse cx="145" cy="120" rx="28" ry="11" fill="rgba(255,255,255,0.3)" />
         </svg>
 
         <!-- Cohete -->
         <svg class="illustration rocket-ship" data-depth="0.12" viewBox="0 0 80 160" fill="none">
             <ellipse cx="40" cy="152" rx="14" ry="22" fill="#ff6b35" opacity="0.85">
-                <animate attributeName="ry" values="22;28;22" dur="0.3s" repeatCount="indefinite"/>
+                <animate attributeName="ry" values="22;28;22" dur="0.3s" repeatCount="indefinite" />
             </ellipse>
             <ellipse cx="40" cy="150" rx="9" ry="16" fill="#ffcba4" opacity="0.9">
-                <animate attributeName="ry" values="16;20;16" dur="0.2s" repeatCount="indefinite"/>
+                <animate attributeName="ry" values="16;20;16" dur="0.2s" repeatCount="indefinite" />
             </ellipse>
-            <path d="M40 8 C18 30, 18 100, 24 122 L56 122 C62 100, 62 30, 40 8Z" fill="#e8e8e8"/>
-            <path d="M40 8 C28 26, 26 65, 28 95 L40 95 L40 8Z" fill="#d0d0d0"/>
-            <circle cx="40" cy="50" r="14" fill="#1e3a5f"/>
-            <circle cx="40" cy="50" r="11" fill="#4a90d9"/>
-            <ellipse cx="36" cy="46" rx="5" ry="4" fill="rgba(255,255,255,0.4)"/>
-            <path d="M24 102 L8 134 L24 122Z" fill="#ff6b35"/>
-            <path d="M56 102 L72 134 L56 122Z" fill="#ff6b35"/>
-            <rect x="34" y="78" width="12" height="18" rx="3" fill="#ff3b30"/>
-            <rect x="28" y="108" width="24" height="6" rx="2" fill="#c0c0c0"/>
+            <path d="M40 8 C18 30, 18 100, 24 122 L56 122 C62 100, 62 30, 40 8Z" fill="#e8e8e8" />
+            <path d="M40 8 C28 26, 26 65, 28 95 L40 95 L40 8Z" fill="#d0d0d0" />
+            <circle cx="40" cy="50" r="14" fill="#1e3a5f" />
+            <circle cx="40" cy="50" r="11" fill="#4a90d9" />
+            <ellipse cx="36" cy="46" rx="5" ry="4" fill="rgba(255,255,255,0.4)" />
+            <path d="M24 102 L8 134 L24 122Z" fill="#ff6b35" />
+            <path d="M56 102 L72 134 L56 122Z" fill="#ff6b35" />
+            <rect x="34" y="78" width="12" height="18" rx="3" fill="#ff3b30" />
+            <rect x="28" y="108" width="24" height="6" rx="2" fill="#c0c0c0" />
         </svg>
 
         <!-- Astronauta -->
         <svg class="illustration astronaut" data-depth="0.09" viewBox="0 0 100 140" fill="none">
-            <rect x="28" y="42" width="44" height="54" rx="6" fill="#b0b0b0"/>
-            <rect x="34" y="48" width="32" height="44" rx="4" fill="#909090"/>
-            <ellipse cx="50" cy="82" rx="26" ry="32" fill="#e8e8e8"/>
-            <ellipse cx="50" cy="82" rx="22" ry="27" fill="#f5f5f5"/>
-            <circle cx="50" cy="32" r="30" fill="#e8e8e8"/>
-            <circle cx="50" cy="32" r="24" fill="#1e3a5f"/>
-            <circle cx="50" cy="32" r="21" fill="#3a6ea5"/>
-            <ellipse cx="44" cy="27" rx="9" ry="7" fill="rgba(255,255,255,0.3)"/>
-            <ellipse cx="18" cy="72" rx="11" ry="20" fill="#e8e8e8"/>
-            <ellipse cx="82" cy="72" rx="11" ry="20" fill="#e8e8e8"/>
-            <ellipse cx="36" cy="118" rx="11" ry="20" fill="#e8e8e8"/>
-            <ellipse cx="64" cy="118" rx="11" ry="20" fill="#e8e8e8"/>
-            <ellipse cx="36" cy="132" rx="13" ry="8" fill="#505050"/>
-            <ellipse cx="64" cy="132" rx="13" ry="8" fill="#505050"/>
-            <circle cx="50" cy="72" r="9" fill="#ff6b35"/>
+            <rect x="28" y="42" width="44" height="54" rx="6" fill="#b0b0b0" />
+            <rect x="34" y="48" width="32" height="44" rx="4" fill="#909090" />
+            <ellipse cx="50" cy="82" rx="26" ry="32" fill="#e8e8e8" />
+            <ellipse cx="50" cy="82" rx="22" ry="27" fill="#f5f5f5" />
+            <circle cx="50" cy="32" r="30" fill="#e8e8e8" />
+            <circle cx="50" cy="32" r="24" fill="#1e3a5f" />
+            <circle cx="50" cy="32" r="21" fill="#3a6ea5" />
+            <ellipse cx="44" cy="27" rx="9" ry="7" fill="rgba(255,255,255,0.3)" />
+            <ellipse cx="18" cy="72" rx="11" ry="20" fill="#e8e8e8" />
+            <ellipse cx="82" cy="72" rx="11" ry="20" fill="#e8e8e8" />
+            <ellipse cx="36" cy="118" rx="11" ry="20" fill="#e8e8e8" />
+            <ellipse cx="64" cy="118" rx="11" ry="20" fill="#e8e8e8" />
+            <ellipse cx="36" cy="132" rx="13" ry="8" fill="#505050" />
+            <ellipse cx="64" cy="132" rx="13" ry="8" fill="#505050" />
+            <circle cx="50" cy="72" r="9" fill="#ff6b35" />
         </svg>
 
         <!-- Rover -->
         <svg class="illustration rover" data-depth="0.05" viewBox="0 0 160 80" fill="none">
-            <rect x="28" y="18" width="104" height="38" rx="10" fill="#d0d0d0"/>
-            <rect x="34" y="24" width="92" height="28" rx="6" fill="#e8e8e8"/>
-            <rect x="44" y="8" width="72" height="14" rx="3" fill="#1e3a5f"/>
-            <rect x="48" y="11" width="16" height="8" fill="#4a90d9"/>
-            <rect x="68" y="11" width="16" height="8" fill="#4a90d9"/>
-            <rect x="88" y="11" width="16" height="8" fill="#4a90d9"/>
-            <rect x="118" y="2" width="5" height="22" fill="#808080"/>
-            <rect x="112" y="0" width="16" height="9" rx="2" fill="#606060"/>
-            <circle cx="120" cy="4" r="3" fill="#ff3b30"/>
-            <circle cx="48" cy="62" r="20" fill="#404040"/>
-            <circle cx="48" cy="62" r="15" fill="#505050"/>
-            <circle cx="48" cy="62" r="7" fill="#606060"/>
-            <circle cx="112" cy="62" r="20" fill="#404040"/>
-            <circle cx="112" cy="62" r="15" fill="#505050"/>
-            <circle cx="112" cy="62" r="7" fill="#606060"/>
-            <rect x="4" y="28" width="32" height="7" rx="3" fill="#909090"/>
-            <circle cx="8" cy="32" r="6" fill="#707070"/>
-            <line x1="80" y1="18" x2="80" y2="4" stroke="#808080" stroke-width="3"/>
-            <circle cx="80" cy="3" r="4" fill="#ff6b35"/>
+            <rect x="28" y="18" width="104" height="38" rx="10" fill="#d0d0d0" />
+            <rect x="34" y="24" width="92" height="28" rx="6" fill="#e8e8e8" />
+            <rect x="44" y="8" width="72" height="14" rx="3" fill="#1e3a5f" />
+            <rect x="48" y="11" width="16" height="8" fill="#4a90d9" />
+            <rect x="68" y="11" width="16" height="8" fill="#4a90d9" />
+            <rect x="88" y="11" width="16" height="8" fill="#4a90d9" />
+            <rect x="118" y="2" width="5" height="22" fill="#808080" />
+            <rect x="112" y="0" width="16" height="9" rx="2" fill="#606060" />
+            <circle cx="120" cy="4" r="3" fill="#ff3b30" />
+            <circle cx="48" cy="62" r="20" fill="#404040" />
+            <circle cx="48" cy="62" r="15" fill="#505050" />
+            <circle cx="48" cy="62" r="7" fill="#606060" />
+            <circle cx="112" cy="62" r="20" fill="#404040" />
+            <circle cx="112" cy="62" r="15" fill="#505050" />
+            <circle cx="112" cy="62" r="7" fill="#606060" />
+            <rect x="4" y="28" width="32" height="7" rx="3" fill="#909090" />
+            <circle cx="8" cy="32" r="6" fill="#707070" />
+            <line x1="80" y1="18" x2="80" y2="4" stroke="#808080" stroke-width="3" />
+            <circle cx="80" cy="3" r="4" fill="#ff6b35" />
         </svg>
 
         <!-- Ruta del hombre a Marte (fondo) -->
         <svg class="bg-route" id="bgRoute" aria-hidden="true">
-            <path class="bg-route-path" id="bgRoutePath" d=""/>
+            <path class="bg-route-path" id="bgRoutePath" d="" />
             <g class="bg-ship" id="bgShip">
-                <path d="M0 -7 L4 4 L0 2 L-4 4 Z" fill="#e8e8e8"/>
-                <ellipse cx="0" cy="6" rx="2" ry="4" fill="#ff9f68" opacity="0.9"/>
+                <path d="M0 -7 L4 4 L0 2 L-4 4 Z" fill="#e8e8e8" />
+                <ellipse cx="0" cy="6" rx="2" ry="4" fill="#ff9f68" opacity="0.9" />
             </g>
         </svg>
     </div>
@@ -1151,7 +1441,9 @@
     <div class="telemetry" id="telemetry" aria-hidden="true">
         <div class="tele-label">TELEMETRÍA</div>
         <div class="tele-phase" id="telePhase">FASE 01 · IGNITION</div>
-        <div class="tele-bar"><div class="tele-fill" id="teleFill"></div></div>
+        <div class="tele-bar">
+            <div class="tele-fill" id="teleFill"></div>
+        </div>
         <div class="tele-pct" id="telePct">RUTA 0%</div>
     </div>
 
@@ -1160,10 +1452,10 @@
         <a href="#" class="nav-logo">
             <!-- Logo SVG -->
             <svg viewBox="0 0 40 40" fill="none">
-                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
-                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
-                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
-                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2" />
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)" />
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2" />
+                <circle cx="20" cy="20" r="4" fill="#ff6b35" />
             </svg>
             <span class="nav-logo-text">MISIÓN MARTE</span>
         </a>
@@ -1175,11 +1467,13 @@
         </ul>
         <a href="#expedicion" class="nav-cta">
             <!-- Rocket icon SVG -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-                <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
-                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                <path
+                    d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
             </svg>
             Comenzar
         </a>
@@ -1191,17 +1485,18 @@
             <div class="hero-section">
                 <div class="hero-badge">
                     <!-- CPU icon SVG -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="4" width="16" height="16" rx="2"/>
-                        <rect x="9" y="9" width="6" height="6"/>
-                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                        <rect x="9" y="9" width="6" height="6" />
+                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
                     </svg>
                     MICROSOFT AGENT FRAMEWORK 1.0 GA
                 </div>
                 <h1 class="hero-title">MISIÓN MARTE</h1>
                 <p class="hero-subtitle">EL DESAFÍO DEL HOMBRE RUMBO A MARTE</p>
                 <p class="hero-description">
-                    Domina <strong>Microsoft Agent Framework</strong> construyendo agentes autónomos 
+                    Domina <strong>Microsoft Agent Framework</strong> construyendo agentes autónomos
                     que coordinan misiones espaciales, toman decisiones críticas y conquistan el planeta rojo.
                     De tu primer agente a sistemas multi-agente en producción.
                 </p>
@@ -1209,14 +1504,16 @@
                     <a href="#expedicion" class="btn-primary">
                         <!-- Play icon SVG -->
                         <svg viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
+                            <polygon points="5 3 19 12 5 21 5 3" />
                         </svg>
                         Iniciar Expedición
                     </a>
-                    <a href="https://github.com/mars-expedition/mars-mission-labs" class="btn-secondary" target="_blank">
+                    <a href="https://github.com/mars-expedition/mars-mission-labs" class="btn-secondary"
+                        target="_blank">
                         <!-- GitHub icon SVG -->
                         <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                         </svg>
                         Ver en GitHub
                     </a>
@@ -1235,55 +1532,60 @@
                     Lo esencial que necesitas saber antes de despegar.
                 </p>
             </div>
-            
+
             <div class="concepts-grid">
                 <div class="concept-card">
                     <!-- Brain/LLM icon -->
-                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="24" cy="24" r="18"/>
-                        <path d="M24 12c-4 0-8 4-8 8s2 6 4 8c2 2 4 6 4 8"/>
-                        <path d="M24 12c4 0 8 4 8 8s-2 6-4 8c-2 2-4 6-4 8"/>
-                        <circle cx="24" cy="24" r="4" fill="rgba(255,107,53,0.3)"/>
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="24" cy="24" r="18" />
+                        <path d="M24 12c-4 0-8 4-8 8s2 6 4 8c2 2 4 6 4 8" />
+                        <path d="M24 12c4 0 8 4 8 8s-2 6-4 8c-2 2-4 6-4 8" />
+                        <circle cx="24" cy="24" r="4" fill="rgba(255,107,53,0.3)" />
                     </svg>
                     <h4>LLM</h4>
                     <p>El cerebro base. Un modelo de IA que comprende y genera lenguaje natural con razonamiento.</p>
                 </div>
                 <div class="concept-card">
                     <!-- Agent icon -->
-                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="24" cy="16" r="10" fill="rgba(255,107,53,0.2)"/>
-                        <path d="M12 40c0-8 5-14 12-14s12 6 12 14"/>
-                        <circle cx="24" cy="16" r="4"/>
-                        <path d="M20 14h8M24 10v8"/>
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="24" cy="16" r="10" fill="rgba(255,107,53,0.2)" />
+                        <path d="M12 40c0-8 5-14 12-14s12 6 12 14" />
+                        <circle cx="24" cy="16" r="4" />
+                        <path d="M20 14h8M24 10v8" />
                     </svg>
                     <h4>Agent</h4>
-                    <p>Sistema autónomo con rol definido, instrucciones específicas y capacidad de usar herramientas.</p>
+                    <p>Sistema autónomo con rol definido, instrucciones específicas y capacidad de usar herramientas.
+                    </p>
                 </div>
                 <div class="concept-card">
                     <!-- Tools icon -->
-                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 34l-6 6 6 6"/>
-                        <path d="M8 40h12"/>
-                        <rect x="24" y="8" width="16" height="16" rx="2" fill="rgba(255,107,53,0.2)"/>
-                        <path d="M28 12h8M28 16h8M28 20h4"/>
-                        <circle cx="16" cy="16" r="8"/>
-                        <path d="M13 16h6M16 13v6"/>
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 34l-6 6 6 6" />
+                        <path d="M8 40h12" />
+                        <rect x="24" y="8" width="16" height="16" rx="2" fill="rgba(255,107,53,0.2)" />
+                        <path d="M28 12h8M28 16h8M28 20h4" />
+                        <circle cx="16" cy="16" r="8" />
+                        <path d="M13 16h6M16 13v6" />
                     </svg>
                     <h4>Tools</h4>
                     <p>Funciones que el agente puede invocar para interactuar con sistemas externos y APIs.</p>
                 </div>
                 <div class="concept-card">
                     <!-- Streaming icon -->
-                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 24h6"/>
-                        <path d="M18 24h6"/>
-                        <path d="M28 24h6"/>
-                        <path d="M38 24h2"/>
-                        <circle cx="11" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
-                        <circle cx="21" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
-                        <circle cx="31" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
-                        <path d="M8 16c8-4 24-4 32 0"/>
-                        <path d="M8 32c8 4 24 4 32 0"/>
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M8 24h6" />
+                        <path d="M18 24h6" />
+                        <path d="M28 24h6" />
+                        <path d="M38 24h2" />
+                        <circle cx="11" cy="24" r="3" fill="rgba(255,107,53,0.3)" />
+                        <circle cx="21" cy="24" r="3" fill="rgba(255,107,53,0.3)" />
+                        <circle cx="31" cy="24" r="3" fill="rgba(255,107,53,0.3)" />
+                        <path d="M8 16c8-4 24-4 32 0" />
+                        <path d="M8 32c8 4 24 4 32 0" />
                     </svg>
                     <h4>Streaming</h4>
                     <p>Respuestas en tiempo real, token por token. Mejor experiencia de usuario.</p>
@@ -1302,37 +1604,37 @@
                     Cada fase construye sobre la anterior. Del primer agente a la colonización.
                 </p>
             </div>
-            
+
             <div class="timeline">
                 <!-- Trayectoria de la expedición -->
                 <svg class="route-svg" id="routeSvg" aria-hidden="true">
                     <defs>
                         <linearGradient id="routeGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#ffcba4"/>
-                            <stop offset="50%" stop-color="#ff6b35"/>
-                            <stop offset="100%" stop-color="#ff3b30"/>
+                            <stop offset="0%" stop-color="#ffcba4" />
+                            <stop offset="50%" stop-color="#ff6b35" />
+                            <stop offset="100%" stop-color="#ff3b30" />
                         </linearGradient>
                     </defs>
-                    <path class="route-base" id="routeBase" d=""/>
-                    <path class="route-progress" id="routeProgress" d=""/>
+                    <path class="route-base" id="routeBase" d="" />
+                    <path class="route-progress" id="routeProgress" d="" />
                     <g class="route-endpoint" id="routeEarth">
-                        <circle r="11" fill="#4a90d9"/>
-                        <ellipse cx="-3" cy="-3" rx="5" ry="4" fill="rgba(76,175,80,0.6)"/>
-                        <ellipse cx="4" cy="4" rx="4" ry="3" fill="rgba(76,175,80,0.5)"/>
+                        <circle r="11" fill="#4a90d9" />
+                        <ellipse cx="-3" cy="-3" rx="5" ry="4" fill="rgba(76,175,80,0.6)" />
+                        <ellipse cx="4" cy="4" rx="4" ry="3" fill="rgba(76,175,80,0.5)" />
                         <text x="-58" y="4">TIERRA</text>
                     </g>
                     <g class="route-endpoint" id="routeMars">
-                        <circle r="12" fill="#e84118"/>
-                        <ellipse cx="-3" cy="-2" rx="4" ry="3" fill="rgba(100,30,20,0.45)"/>
-                        <ellipse cx="4" cy="5" rx="3" ry="2.5" fill="rgba(80,25,15,0.4)"/>
+                        <circle r="12" fill="#e84118" />
+                        <ellipse cx="-3" cy="-2" rx="4" ry="3" fill="rgba(100,30,20,0.45)" />
+                        <ellipse cx="4" cy="5" rx="3" ry="2.5" fill="rgba(80,25,15,0.4)" />
                         <text x="-56" y="4">MARTE</text>
                     </g>
                     <g class="route-ship" id="routeShip">
-                        <path d="M0 -10 C-5 -4, -5 5, -3.5 8 L3.5 8 C5 5, 5 -4, 0 -10Z" fill="#e8e8e8"/>
-                        <circle cx="0" cy="-1" r="2.5" fill="#4a90d9"/>
-                        <path d="M-3.5 4 L-7 11 L-3.5 8Z" fill="#ff6b35"/>
-                        <path d="M3.5 4 L7 11 L3.5 8Z" fill="#ff6b35"/>
-                        <ellipse class="s-flame" cx="0" cy="12" rx="2.5" ry="5" fill="#ff9f68" opacity="0.9"/>
+                        <path d="M0 -10 C-5 -4, -5 5, -3.5 8 L3.5 8 C5 5, 5 -4, 0 -10Z" fill="#e8e8e8" />
+                        <circle cx="0" cy="-1" r="2.5" fill="#4a90d9" />
+                        <path d="M-3.5 4 L-7 11 L-3.5 8Z" fill="#ff6b35" />
+                        <path d="M3.5 4 L7 11 L3.5 8Z" fill="#ff6b35" />
+                        <ellipse class="s-flame" cx="0" cy="12" rx="2.5" ry="5" fill="#ff9f68" opacity="0.9" />
                     </g>
                 </svg>
 
@@ -1345,30 +1647,32 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Ignition icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
-                                    <circle cx="12" cy="12" r="4" fill="rgba(255,107,53,0.3)"/>
-                                    <path d="M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+                                    <circle cx="12" cy="12" r="4" fill="rgba(255,107,53,0.3)" />
+                                    <path d="M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2" />
                                 </svg>
                             </div>
                             <span class="phase-label">IGNITION</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="18" cy="18" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="134" cy="30" r="1.2" fill="white" opacity="0.35"/>
-                            <circle cx="30" cy="70" r="0.9" fill="white" opacity="0.4"/>
-                            <rect x="62" y="4" width="26" height="10" rx="3" fill="#909090"/>
-                            <path d="M55 12 L95 12 L88 30 L62 30 Z" fill="#d0d0d0"/>
-                            <path d="M62 30 L88 30 L83 44 L67 44 Z" fill="#707070"/>
-                            <circle class="s-pulse" cx="75" cy="46" r="24" fill="none" stroke="rgba(255,159,104,0.5)" stroke-dasharray="3 5"/>
-                            <ellipse class="s-flame" cx="75" cy="62" rx="13" ry="18" fill="#ff6b35" opacity="0.85"/>
-                            <ellipse class="s-flame" cx="75" cy="58" rx="8" ry="12" fill="#ffcba4" opacity="0.9"/>
-                            <rect class="s-chip" x="96" y="86" width="46" height="16" rx="5"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="18" cy="18" r="1" fill="white" opacity="0.4" />
+                            <circle cx="134" cy="30" r="1.2" fill="white" opacity="0.35" />
+                            <circle cx="30" cy="70" r="0.9" fill="white" opacity="0.4" />
+                            <rect x="62" y="4" width="26" height="10" rx="3" fill="#909090" />
+                            <path d="M55 12 L95 12 L88 30 L62 30 Z" fill="#d0d0d0" />
+                            <path d="M62 30 L88 30 L83 44 L67 44 Z" fill="#707070" />
+                            <circle class="s-pulse" cx="75" cy="46" r="24" fill="none" stroke="rgba(255,159,104,0.5)"
+                                stroke-dasharray="3 5" />
+                            <ellipse class="s-flame" cx="75" cy="62" rx="13" ry="18" fill="#ff6b35" opacity="0.85" />
+                            <ellipse class="s-flame" cx="75" cy="58" rx="8" ry="12" fill="#ffcba4" opacity="0.9" />
+                            <rect class="s-chip" x="96" y="86" width="46" height="16" rx="5" />
                             <text x="103" y="97">run()</text>
                         </svg>
                         <h3 class="phase-title">Encendido: Fundamentos del Framework</h3>
                         <p class="phase-description">
-                            Los motores se encienden. Crea tu primer agente con <code>client.as_agent()</code> 
+                            Los motores se encienden. Crea tu primer agente con <code>client.as_agent()</code>
                             y domina ejecución síncrona vs streaming.
                         </p>
                         <div class="phase-tags">
@@ -1388,39 +1692,46 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Launch icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 2L9 9h6L12 2Z" fill="rgba(255,107,53,0.3)"/>
-                                    <path d="M12 9v11"/>
-                                    <path d="M8 22h8"/>
-                                    <path d="M7 17l5 5 5-5"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2L9 9h6L12 2Z" fill="rgba(255,107,53,0.3)" />
+                                    <path d="M12 9v11" />
+                                    <path d="M8 22h8" />
+                                    <path d="M7 17l5 5 5-5" />
                                 </svg>
                             </div>
                             <span class="phase-label">LAUNCH</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="14" cy="14" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="140" cy="60" r="1" fill="white" opacity="0.35"/>
-                            <line class="s-dash" x1="28" y1="96" x2="48" y2="76" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
-                            <line class="s-dash" x1="38" y1="102" x2="54" y2="86" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-                            <line class="s-dash" x1="20" y1="84" x2="36" y2="68" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
-                            <line x1="39" y1="36" x2="62" y2="48" stroke="rgba(255,159,104,0.5)" stroke-dasharray="2 4"/>
-                            <line x1="110" y1="27" x2="92" y2="38" stroke="rgba(255,159,104,0.5)" stroke-dasharray="2 4"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="14" cy="14" r="1" fill="white" opacity="0.4" />
+                            <circle cx="140" cy="60" r="1" fill="white" opacity="0.35" />
+                            <line class="s-dash" x1="28" y1="96" x2="48" y2="76" stroke="rgba(255,255,255,0.35)"
+                                stroke-width="2" />
+                            <line class="s-dash" x1="38" y1="102" x2="54" y2="86" stroke="rgba(255,255,255,0.3)"
+                                stroke-width="2" />
+                            <line class="s-dash" x1="20" y1="84" x2="36" y2="68" stroke="rgba(255,255,255,0.25)"
+                                stroke-width="2" />
+                            <line x1="39" y1="36" x2="62" y2="48" stroke="rgba(255,159,104,0.5)"
+                                stroke-dasharray="2 4" />
+                            <line x1="110" y1="27" x2="92" y2="38" stroke="rgba(255,159,104,0.5)"
+                                stroke-dasharray="2 4" />
                             <g transform="rotate(38 80 50)">
-                                <path d="M80 14 C68 28, 66 62, 69 76 L91 76 C94 62, 92 28, 80 14Z" fill="#e8e8e8"/>
-                                <circle cx="80" cy="40" r="6" fill="#4a90d9"/>
-                                <path d="M69 64 L60 82 L69 76Z" fill="#ff6b35"/>
-                                <path d="M91 64 L100 82 L91 76Z" fill="#ff6b35"/>
-                                <ellipse class="s-flame" cx="80" cy="84" rx="5" ry="9" fill="#ff9f68" opacity="0.9"/>
+                                <path d="M80 14 C68 28, 66 62, 69 76 L91 76 C94 62, 92 28, 80 14Z" fill="#e8e8e8" />
+                                <circle cx="80" cy="40" r="6" fill="#4a90d9" />
+                                <path d="M69 64 L60 82 L69 76Z" fill="#ff6b35" />
+                                <path d="M91 64 L100 82 L91 76Z" fill="#ff6b35" />
+                                <ellipse class="s-flame" cx="80" cy="84" rx="5" ry="9" fill="#ff9f68" opacity="0.9" />
                             </g>
                             <g class="s-bob">
-                                <circle cx="30" cy="30" r="11" fill="rgba(255,107,53,0.15)" stroke="#ff9f68"/>
-                                <rect x="25" y="28" width="10" height="4" rx="1.5" fill="#ffcba4" transform="rotate(45 30 30)"/>
+                                <circle cx="30" cy="30" r="11" fill="rgba(255,107,53,0.15)" stroke="#ff9f68" />
+                                <rect x="25" y="28" width="10" height="4" rx="1.5" fill="#ffcba4"
+                                    transform="rotate(45 30 30)" />
                             </g>
                             <g class="s-bob" style="animation-delay: -1.4s">
-                                <circle cx="118" cy="20" r="9" fill="rgba(255,107,53,0.15)" stroke="#ff9f68"/>
-                                <circle cx="118" cy="20" r="3.5" fill="none" stroke="#ffcba4" stroke-width="2"/>
+                                <circle cx="118" cy="20" r="9" fill="rgba(255,107,53,0.15)" stroke="#ff9f68" />
+                                <circle cx="118" cy="20" r="3.5" fill="none" stroke="#ffcba4" stroke-width="2" />
                             </g>
-                            <rect class="s-chip" x="100" y="86" width="44" height="16" rx="5"/>
+                            <rect class="s-chip" x="100" y="86" width="44" height="16" rx="5" />
                             <text x="106" y="97">tools=</text>
                         </svg>
                         <h3 class="phase-title">Lanzamiento: Tools y MCP</h3>
@@ -1441,47 +1752,51 @@
                     <div class="phase-marker">
                         <div class="phase-number">03</div>
                     </div>
-                    <div class="phase-content disabled">
+                    <a href="phases/03-orbit.html" class="phase-content">
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Orbit icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="8"/>
-                                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(60 12 12)"/>
-                                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(-60 12 12)"/>
-                                    <circle cx="12" cy="12" r="2" fill="rgba(255,107,53,0.5)"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="8" />
+                                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(60 12 12)" />
+                                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(-60 12 12)" />
+                                    <circle cx="12" cy="12" r="2" fill="rgba(255,107,53,0.5)" />
                                 </svg>
                             </div>
                             <span class="phase-label">ORBIT</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="20" cy="20" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="136" cy="74" r="1" fill="white" opacity="0.35"/>
-                            <ellipse cx="62" cy="56" rx="40" ry="14" fill="none" stroke="rgba(255,159,104,0.25)" transform="rotate(-18 62 56)"/>
-                            <circle cx="62" cy="56" r="16" fill="#e84118"/>
-                            <ellipse cx="57" cy="52" rx="5" ry="4" fill="rgba(100,30,20,0.5)"/>
-                            <circle cx="62" cy="56" r="30" fill="none" stroke="rgba(255,159,104,0.4)" stroke-dasharray="2 5"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="20" cy="20" r="1" fill="white" opacity="0.4" />
+                            <circle cx="136" cy="74" r="1" fill="white" opacity="0.35" />
+                            <ellipse cx="62" cy="56" rx="40" ry="14" fill="none" stroke="rgba(255,159,104,0.25)"
+                                transform="rotate(-18 62 56)" />
+                            <circle cx="62" cy="56" r="16" fill="#e84118" />
+                            <ellipse cx="57" cy="52" rx="5" ry="4" fill="rgba(100,30,20,0.5)" />
+                            <circle cx="62" cy="56" r="30" fill="none" stroke="rgba(255,159,104,0.4)"
+                                stroke-dasharray="2 5" />
                             <g class="s-orbiter">
-                                <rect x="58" y="21" width="8" height="10" rx="3" fill="#e8e8e8"/>
-                                <circle cx="62" cy="25" r="1.8" fill="#4a90d9"/>
+                                <rect x="58" y="21" width="8" height="10" rx="3" fill="#e8e8e8" />
+                                <circle cx="62" cy="25" r="1.8" fill="#4a90d9" />
                             </g>
-                            <path class="s-pulse" d="M96 34 a16 16 0 0 1 9 14" fill="none" stroke="#ffcba4" opacity="0.6"/>
-                            <path class="s-pulse" d="M101 28 a22 22 0 0 1 12 19" fill="none" stroke="#ffcba4" opacity="0.35" style="animation-delay: -1.2s"/>
-                            <rect class="s-chip" x="88" y="86" width="54" height="16" rx="5"/>
-                            <text x="95" y="97">session</text>
+                            <path class="s-pulse" d="M96 34 a16 16 0 0 1 9 14" fill="none" stroke="#ffcba4"
+                                opacity="0.6" />
+                            <path class="s-pulse" d="M101 28 a22 22 0 0 1 12 19" fill="none" stroke="#ffcba4"
+                                opacity="0.35" style="animation-delay: -1.2s" />
+                            <rect class="s-chip" x="106" y="86" width="36" height="16" rx="5" />
+                            <text x="113" y="97">RAG</text>
                         </svg>
-                        <h3 class="phase-title">Órbita: Sesiones y Comunicaciones</h3>
+                        <h3 class="phase-title">Órbita: RAG y Conocimiento</h3>
                         <p class="phase-description">
-                            Órbita estable alcanzada. Sesiones multi-turno con <code>create_session()</code> 
-                            y middleware de auditoría.
+                            Órbita estable alcanzada. Conecta agentes a bases de conocimiento
+                            con RAG, Azure AI Search y herramientas <code>@Tool</code>.
                         </p>
                         <div class="phase-tags">
-                            <span class="tag">Session</span>
-                            <span class="tag">Middleware</span>
-                            <span class="tag">Auditoría</span>
-                            <span class="tag tag-soon">Señal pendiente</span>
+                            <span class="tag">RAG</span>
+                            <span class="tag">Azure AI Search</span>
+                            <span class="tag">Foundry</span>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- Phase 4 -->
@@ -1493,39 +1808,44 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Transit icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="5" cy="12" r="3" fill="rgba(74,144,217,0.4)" stroke="#4a90d9"/>
-                                    <circle cx="19" cy="12" r="3" fill="rgba(255,107,53,0.4)"/>
-                                    <path d="M8 12h8" stroke-dasharray="2 2"/>
-                                    <path d="M14 9l3 3-3 3"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="5" cy="12" r="3" fill="rgba(74,144,217,0.4)" stroke="#4a90d9" />
+                                    <circle cx="19" cy="12" r="3" fill="rgba(255,107,53,0.4)" />
+                                    <path d="M8 12h8" stroke-dasharray="2 2" />
+                                    <path d="M14 9l3 3-3 3" />
                                 </svg>
                             </div>
                             <span class="phase-label">TRANSIT</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="60" cy="16" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="104" cy="70" r="1" fill="white" opacity="0.35"/>
-                            <circle cx="18" cy="78" r="10" fill="#4a90d9"/>
-                            <ellipse cx="15" cy="75" rx="4" ry="3" fill="rgba(76,175,80,0.6)"/>
-                            <ellipse cx="22" cy="81" rx="3.5" ry="2.5" fill="rgba(76,175,80,0.5)"/>
-                            <circle cx="130" cy="26" r="11" fill="#e84118"/>
-                            <ellipse cx="126" cy="23" rx="4" ry="3" fill="rgba(100,30,20,0.5)"/>
-                            <path d="M28 72 C 55 60, 95 44, 120 32" fill="none" stroke="rgba(255,159,104,0.45)" stroke-dasharray="4 6"/>
-                            <rect class="s-pkt" width="7" height="7" rx="2" fill="#ffcba4" style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')"/>
-                            <rect class="s-pkt d1" width="7" height="7" rx="2" fill="#ff9f68" style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')"/>
-                            <rect class="s-pkt d2" width="7" height="7" rx="2" fill="#ff6b35" style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')"/>
-                            <rect class="s-chip" x="106" y="86" width="36" height="16" rx="5"/>
-                            <text x="113" y="97">RAG</text>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="60" cy="16" r="1" fill="white" opacity="0.4" />
+                            <circle cx="104" cy="70" r="1" fill="white" opacity="0.35" />
+                            <circle cx="18" cy="78" r="10" fill="#4a90d9" />
+                            <ellipse cx="15" cy="75" rx="4" ry="3" fill="rgba(76,175,80,0.6)" />
+                            <ellipse cx="22" cy="81" rx="3.5" ry="2.5" fill="rgba(76,175,80,0.5)" />
+                            <circle cx="130" cy="26" r="11" fill="#e84118" />
+                            <ellipse cx="126" cy="23" rx="4" ry="3" fill="rgba(100,30,20,0.5)" />
+                            <path d="M28 72 C 55 60, 95 44, 120 32" fill="none" stroke="rgba(255,159,104,0.45)"
+                                stroke-dasharray="4 6" />
+                            <rect class="s-pkt" width="7" height="7" rx="2" fill="#ffcba4"
+                                style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')" />
+                            <rect class="s-pkt d1" width="7" height="7" rx="2" fill="#ff9f68"
+                                style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')" />
+                            <rect class="s-pkt d2" width="7" height="7" rx="2" fill="#ff6b35"
+                                style="offset-path: path('M28 72 C 55 60, 95 44, 120 32')" />
+                            <rect class="s-chip" x="88" y="86" width="54" height="16" rx="5" />
+                            <text x="95" y="97">session</text>
                         </svg>
-                        <h3 class="phase-title">Tránsito: RAG y Conocimiento</h3>
+                        <h3 class="phase-title">Tránsito: Sesiones y Comunicaciones</h3>
                         <p class="phase-description">
-                            7 meses en el espacio profundo. Conecta agentes a bases de conocimiento 
-                            con RAG y <code>ContextProvider</code>.
+                            7 meses en el espacio profundo. Sesiones multi-turno con <code>create_session()</code>
+                            y middleware de auditoría.
                         </p>
                         <div class="phase-tags">
-                            <span class="tag">RAG</span>
-                            <span class="tag">ContextProvider</span>
-                            <span class="tag">Embeddings</span>
+                            <span class="tag">Session</span>
+                            <span class="tag">Middleware</span>
+                            <span class="tag">Auditoría</span>
                             <span class="tag tag-soon">Señal pendiente</span>
                         </div>
                     </div>
@@ -1540,36 +1860,41 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Target/Approach icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <circle cx="12" cy="12" r="6"/>
-                                    <circle cx="12" cy="12" r="2" fill="rgba(255,107,53,0.5)"/>
-                                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <circle cx="12" cy="12" r="6" />
+                                    <circle cx="12" cy="12" r="2" fill="rgba(255,107,53,0.5)" />
+                                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
                                 </svg>
                             </div>
                             <span class="phase-label">APPROACH</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="20" cy="24" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="140" cy="80" r="1" fill="white" opacity="0.35"/>
-                            <circle class="s-pulse" cx="92" cy="42" r="26" fill="none" stroke="rgba(255,159,104,0.55)"/>
-                            <circle cx="92" cy="42" r="16" fill="none" stroke="rgba(255,159,104,0.4)"/>
-                            <line x1="92" y1="10" x2="92" y2="18" stroke="#ffcba4"/>
-                            <line x1="92" y1="66" x2="92" y2="74" stroke="#ffcba4"/>
-                            <line x1="60" y1="42" x2="68" y2="42" stroke="#ffcba4"/>
-                            <line x1="116" y1="42" x2="124" y2="42" stroke="#ffcba4"/>
-                            <circle cx="92" cy="42" r="8" fill="#e84118"/>
-                            <ellipse cx="89" cy="40" rx="2.5" ry="2" fill="rgba(100,30,20,0.5)"/>
-                            <rect x="22" y="80" width="34" height="11" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,159,104,0.35)"/>
-                            <rect x="18" y="73" width="34" height="11" rx="3" fill="rgba(255,255,255,0.12)" stroke="rgba(255,159,104,0.35)"/>
-                            <rect x="14" y="66" width="34" height="11" rx="3" fill="rgba(255,255,255,0.14)" stroke="rgba(255,159,104,0.45)"/>
-                            <circle cx="44" cy="68" r="2.5" fill="#7CFC98"/>
-                            <rect class="s-chip" x="84" y="86" width="58" height="16" rx="5"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="20" cy="24" r="1" fill="white" opacity="0.4" />
+                            <circle cx="140" cy="80" r="1" fill="white" opacity="0.35" />
+                            <circle class="s-pulse" cx="92" cy="42" r="26" fill="none"
+                                stroke="rgba(255,159,104,0.55)" />
+                            <circle cx="92" cy="42" r="16" fill="none" stroke="rgba(255,159,104,0.4)" />
+                            <line x1="92" y1="10" x2="92" y2="18" stroke="#ffcba4" />
+                            <line x1="92" y1="66" x2="92" y2="74" stroke="#ffcba4" />
+                            <line x1="60" y1="42" x2="68" y2="42" stroke="#ffcba4" />
+                            <line x1="116" y1="42" x2="124" y2="42" stroke="#ffcba4" />
+                            <circle cx="92" cy="42" r="8" fill="#e84118" />
+                            <ellipse cx="89" cy="40" rx="2.5" ry="2" fill="rgba(100,30,20,0.5)" />
+                            <rect x="22" y="80" width="34" height="11" rx="3" fill="rgba(255,255,255,0.12)"
+                                stroke="rgba(255,159,104,0.35)" />
+                            <rect x="18" y="73" width="34" height="11" rx="3" fill="rgba(255,255,255,0.12)"
+                                stroke="rgba(255,159,104,0.35)" />
+                            <rect x="14" y="66" width="34" height="11" rx="3" fill="rgba(255,255,255,0.14)"
+                                stroke="rgba(255,159,104,0.45)" />
+                            <circle cx="44" cy="68" r="2.5" fill="#7CFC98" />
+                            <rect class="s-chip" x="84" y="86" width="58" height="16" rx="5" />
                             <text x="91" y="97">memoria</text>
                         </svg>
                         <h3 class="phase-title">Aproximación: Memoria Persistente</h3>
                         <p class="phase-description">
-                            Marte en el horizonte. Memoria que persiste entre sesiones con Redis 
+                            Marte en el horizonte. Memoria que persiste entre sesiones con Redis
                             y memoria semántica con Mem0.
                         </p>
                         <div class="phase-tags">
@@ -1590,34 +1915,39 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Entry/Flame icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22c-4 0-8-3-8-8 0-3 2-6 4-8 0 2 1 4 3 5 0-3 2-6 4-8 1 3 3 5 3 8 1-1 2-2 2-4 2 2 2 5 2 7 0 5-4 8-8 8z" fill="rgba(255,107,53,0.2)"/>
-                                    <path d="M12 22c-2 0-4-2-4-4 0-2 2-4 4-6 2 2 4 4 4 6 0 2-2 4-4 4z"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M12 22c-4 0-8-3-8-8 0-3 2-6 4-8 0 2 1 4 3 5 0-3 2-6 4-8 1 3 3 5 3 8 1-1 2-2 2-4 2 2 2 5 2 7 0 5-4 8-8 8z"
+                                        fill="rgba(255,107,53,0.2)" />
+                                    <path d="M12 22c-2 0-4-2-4-4 0-2 2-4 4-6 2 2 4 4 4 6 0 2-2 4-4 4z" />
                                 </svg>
                             </div>
                             <span class="phase-label">ENTRY</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="22" cy="16" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="124" cy="14" r="1" fill="white" opacity="0.35"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="22" cy="16" r="1" fill="white" opacity="0.4" />
+                            <circle cx="124" cy="14" r="1" fill="white" opacity="0.35" />
                             <g transform="rotate(-18 60 44)">
-                                <path d="M42 50 Q60 14 78 50 Z" fill="#e8e8e8"/>
-                                <rect x="44" y="50" width="32" height="7" rx="3" fill="#909090"/>
-                                <circle cx="60" cy="42" r="4" fill="#4a90d9"/>
+                                <path d="M42 50 Q60 14 78 50 Z" fill="#e8e8e8" />
+                                <rect x="44" y="50" width="32" height="7" rx="3" fill="#909090" />
+                                <circle cx="60" cy="42" r="4" fill="#4a90d9" />
                             </g>
-                            <path d="M34 62 Q60 78 86 62" fill="none" stroke="#ff6b35" stroke-width="5" opacity="0.7"/>
-                            <path class="s-pulse" d="M30 70 Q60 88 90 70" fill="none" stroke="#ff9f68" stroke-width="3" opacity="0.45"/>
-                            <path d="M26 78 Q60 97 94 78" fill="none" stroke="#ffcba4" stroke-width="2" opacity="0.25"/>
-                            <rect class="s-bar" x="112" y="50" width="6" height="22" fill="rgba(255,159,104,0.7)"/>
-                            <rect class="s-bar d1" x="122" y="58" width="6" height="14" fill="rgba(255,107,53,0.7)"/>
-                            <rect class="s-bar d2" x="132" y="46" width="6" height="26" fill="rgba(255,203,164,0.7)"/>
-                            <line x1="108" y1="74" x2="142" y2="74" stroke="rgba(255,255,255,0.25)"/>
-                            <rect class="s-chip" x="92" y="86" width="50" height="16" rx="5"/>
+                            <path d="M34 62 Q60 78 86 62" fill="none" stroke="#ff6b35" stroke-width="5" opacity="0.7" />
+                            <path class="s-pulse" d="M30 70 Q60 88 90 70" fill="none" stroke="#ff9f68" stroke-width="3"
+                                opacity="0.45" />
+                            <path d="M26 78 Q60 97 94 78" fill="none" stroke="#ffcba4" stroke-width="2"
+                                opacity="0.25" />
+                            <rect class="s-bar" x="112" y="50" width="6" height="22" fill="rgba(255,159,104,0.7)" />
+                            <rect class="s-bar d1" x="122" y="58" width="6" height="14" fill="rgba(255,107,53,0.7)" />
+                            <rect class="s-bar d2" x="132" y="46" width="6" height="26" fill="rgba(255,203,164,0.7)" />
+                            <line x1="108" y1="74" x2="142" y2="74" stroke="rgba(255,255,255,0.25)" />
+                            <rect class="s-chip" x="92" y="86" width="50" height="16" rx="5" />
                             <text x="99" y="97">traces</text>
                         </svg>
                         <h3 class="phase-title">Entrada Atmosférica: Observabilidad</h3>
                         <p class="phase-description">
-                            Los 7 minutos del terror. Instrumenta con OpenTelemetry y evalúa 
+                            Los 7 minutos del terror. Instrumenta con OpenTelemetry y evalúa
                             calidad con Azure AI Evaluation.
                         </p>
                         <div class="phase-tags">
@@ -1638,41 +1968,48 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Descent/Multi-agent icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="8" cy="8" r="4" fill="rgba(255,107,53,0.3)"/>
-                                    <circle cx="16" cy="8" r="4" fill="rgba(255,107,53,0.3)"/>
-                                    <circle cx="12" cy="18" r="4" fill="rgba(255,107,53,0.3)"/>
-                                    <path d="M8 12v2l4 4M16 12v2l-4 4"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="8" cy="8" r="4" fill="rgba(255,107,53,0.3)" />
+                                    <circle cx="16" cy="8" r="4" fill="rgba(255,107,53,0.3)" />
+                                    <circle cx="12" cy="18" r="4" fill="rgba(255,107,53,0.3)" />
+                                    <path d="M8 12v2l4 4M16 12v2l-4 4" />
                                 </svg>
                             </div>
                             <span class="phase-label">DESCENT</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <line x1="45" y1="16" x2="75" y2="10" stroke="rgba(255,159,104,0.4)"/>
-                            <line x1="75" y1="10" x2="105" y2="16" stroke="rgba(255,159,104,0.4)"/>
-                            <line x1="75" y1="10" x2="75" y2="28" stroke="rgba(255,159,104,0.4)" stroke-dasharray="2 4"/>
-                            <circle class="s-pulse" cx="45" cy="16" r="6" fill="rgba(255,107,53,0.2)" stroke="#ff9f68"/>
-                            <circle cx="45" cy="16" r="2" fill="#ffcba4"/>
-                            <circle class="s-pulse" cx="75" cy="10" r="6" fill="rgba(255,107,53,0.2)" stroke="#ff9f68" style="animation-delay: -0.8s"/>
-                            <circle cx="75" cy="10" r="2" fill="#ffcba4"/>
-                            <circle class="s-pulse" cx="105" cy="16" r="6" fill="rgba(255,107,53,0.2)" stroke="#ff9f68" style="animation-delay: -1.6s"/>
-                            <circle cx="105" cy="16" r="2" fill="#ffcba4"/>
-                            <rect x="65" y="28" width="20" height="8" rx="3" fill="#909090"/>
-                            <rect x="55" y="34" width="40" height="20" rx="5" fill="#d0d0d0"/>
-                            <line x1="58" y1="54" x2="46" y2="72" stroke="#b0b0b0" stroke-width="3"/>
-                            <line x1="92" y1="54" x2="104" y2="72" stroke="#b0b0b0" stroke-width="3"/>
-                            <rect x="57" y="54" width="6" height="4" fill="#707070"/>
-                            <rect x="72" y="54" width="6" height="4" fill="#707070"/>
-                            <rect x="87" y="54" width="6" height="4" fill="#707070"/>
-                            <ellipse class="s-flame" cx="60" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9"/>
-                            <ellipse class="s-flame" cx="75" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9" style="animation-delay: -0.2s"/>
-                            <ellipse class="s-flame" cx="90" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9" style="animation-delay: -0.35s"/>
-                            <rect class="s-chip" x="94" y="86" width="50" height="16" rx="5"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <line x1="45" y1="16" x2="75" y2="10" stroke="rgba(255,159,104,0.4)" />
+                            <line x1="75" y1="10" x2="105" y2="16" stroke="rgba(255,159,104,0.4)" />
+                            <line x1="75" y1="10" x2="75" y2="28" stroke="rgba(255,159,104,0.4)"
+                                stroke-dasharray="2 4" />
+                            <circle class="s-pulse" cx="45" cy="16" r="6" fill="rgba(255,107,53,0.2)"
+                                stroke="#ff9f68" />
+                            <circle cx="45" cy="16" r="2" fill="#ffcba4" />
+                            <circle class="s-pulse" cx="75" cy="10" r="6" fill="rgba(255,107,53,0.2)" stroke="#ff9f68"
+                                style="animation-delay: -0.8s" />
+                            <circle cx="75" cy="10" r="2" fill="#ffcba4" />
+                            <circle class="s-pulse" cx="105" cy="16" r="6" fill="rgba(255,107,53,0.2)" stroke="#ff9f68"
+                                style="animation-delay: -1.6s" />
+                            <circle cx="105" cy="16" r="2" fill="#ffcba4" />
+                            <rect x="65" y="28" width="20" height="8" rx="3" fill="#909090" />
+                            <rect x="55" y="34" width="40" height="20" rx="5" fill="#d0d0d0" />
+                            <line x1="58" y1="54" x2="46" y2="72" stroke="#b0b0b0" stroke-width="3" />
+                            <line x1="92" y1="54" x2="104" y2="72" stroke="#b0b0b0" stroke-width="3" />
+                            <rect x="57" y="54" width="6" height="4" fill="#707070" />
+                            <rect x="72" y="54" width="6" height="4" fill="#707070" />
+                            <rect x="87" y="54" width="6" height="4" fill="#707070" />
+                            <ellipse class="s-flame" cx="60" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9" />
+                            <ellipse class="s-flame" cx="75" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9"
+                                style="animation-delay: -0.2s" />
+                            <ellipse class="s-flame" cx="90" cy="64" rx="4" ry="8" fill="#ff9f68" opacity="0.9"
+                                style="animation-delay: -0.35s" />
+                            <rect class="s-chip" x="94" y="86" width="50" height="16" rx="5" />
                             <text x="101" y="97">agents</text>
                         </svg>
                         <h3 class="phase-title">Descenso: Workflows Multi-Agente</h3>
                         <p class="phase-description">
-                            Coordinación perfecta. Orquesta múltiples agentes con 
+                            Coordinación perfecta. Orquesta múltiples agentes con
                             <code>SequentialBuilder</code> y <code>ConcurrentBuilder</code>.
                         </p>
                         <div class="phase-tags">
@@ -1693,38 +2030,42 @@
                         <div class="phase-header">
                             <div class="phase-icon">
                                 <!-- Landing icon -->
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 20h16"/>
-                                    <path d="M12 20V10"/>
-                                    <path d="M12 10l-5-8h10l-5 8Z" fill="rgba(255,107,53,0.3)"/>
-                                    <rect x="10" y="4" width="4" height="3" fill="rgba(255,107,53,0.5)"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 20h16" />
+                                    <path d="M12 20V10" />
+                                    <path d="M12 10l-5-8h10l-5 8Z" fill="rgba(255,107,53,0.3)" />
+                                    <rect x="10" y="4" width="4" height="3" fill="rgba(255,107,53,0.5)" />
                                 </svg>
                             </div>
                             <span class="phase-label">LANDING</span>
                         </div>
-                                                <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
-                            <circle cx="20" cy="18" r="1" fill="white" opacity="0.4"/>
-                            <circle cx="70" cy="12" r="1" fill="white" opacity="0.35"/>
-                            <path d="M0 88 Q 40 78 75 84 T 150 82 L150 110 L0 110 Z" fill="rgba(232,65,24,0.25)"/>
-                            <path d="M0 88 Q 40 78 75 84 T 150 82" fill="none" stroke="rgba(255,107,53,0.5)"/>
-                            <rect x="36" y="58" width="30" height="16" rx="4" fill="#d0d0d0"/>
-                            <line x1="40" y1="74" x2="34" y2="86" stroke="#b0b0b0" stroke-width="2.5"/>
-                            <line x1="62" y1="74" x2="70" y2="86" stroke="#b0b0b0" stroke-width="2.5"/>
-                            <line x1="88" y1="46" x2="88" y2="84" stroke="#e8e8e8" stroke-width="2.5"/>
-                            <path class="s-flag" d="M88 46 L112 52 L88 58 Z" fill="#ff6b35"/>
+                        <svg class="phase-scene" viewBox="0 0 150 110" aria-hidden="true">
+                            <circle cx="20" cy="18" r="1" fill="white" opacity="0.4" />
+                            <circle cx="70" cy="12" r="1" fill="white" opacity="0.35" />
+                            <path d="M0 88 Q 40 78 75 84 T 150 82 L150 110 L0 110 Z" fill="rgba(232,65,24,0.25)" />
+                            <path d="M0 88 Q 40 78 75 84 T 150 82" fill="none" stroke="rgba(255,107,53,0.5)" />
+                            <rect x="36" y="58" width="30" height="16" rx="4" fill="#d0d0d0" />
+                            <line x1="40" y1="74" x2="34" y2="86" stroke="#b0b0b0" stroke-width="2.5" />
+                            <line x1="62" y1="74" x2="70" y2="86" stroke="#b0b0b0" stroke-width="2.5" />
+                            <line x1="88" y1="46" x2="88" y2="84" stroke="#e8e8e8" stroke-width="2.5" />
+                            <path class="s-flag" d="M88 46 L112 52 L88 58 Z" fill="#ff6b35" />
                             <g class="s-bob">
-                                <rect x="100" y="10" width="40" height="26" rx="4" fill="rgba(255,255,255,0.08)" stroke="rgba(255,159,104,0.5)"/>
-                                <line x1="106" y1="18" x2="126" y2="18" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-                                <line x1="106" y1="25" x2="120" y2="25" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-                                <circle cx="132" cy="29" r="5" fill="rgba(124,252,152,0.2)" stroke="#7CFC98"/>
-                                <path d="M129.5 29 l2 2 l3.5 -4.5" fill="none" stroke="#7CFC98" stroke-width="1.5"/>
+                                <rect x="100" y="10" width="40" height="26" rx="4" fill="rgba(255,255,255,0.08)"
+                                    stroke="rgba(255,159,104,0.5)" />
+                                <line x1="106" y1="18" x2="126" y2="18" stroke="rgba(255,255,255,0.4)"
+                                    stroke-width="2" />
+                                <line x1="106" y1="25" x2="120" y2="25" stroke="rgba(255,255,255,0.4)"
+                                    stroke-width="2" />
+                                <circle cx="132" cy="29" r="5" fill="rgba(124,252,152,0.2)" stroke="#7CFC98" />
+                                <path d="M129.5 29 l2 2 l3.5 -4.5" fill="none" stroke="#7CFC98" stroke-width="1.5" />
                             </g>
-                            <rect class="s-chip" x="8" y="86" width="40" height="16" rx="5"/>
+                            <rect class="s-chip" x="8" y="86" width="40" height="16" rx="5" />
                             <text x="15" y="97">HITL</text>
                         </svg>
                         <h3 class="phase-title">Aterrizaje: HITL y Frontend</h3>
                         <p class="phase-description">
-                            ¡Superficie de Marte! Aprobaciones humanas con <code>approval_mode</code> 
+                            ¡Superficie de Marte! Aprobaciones humanas con <code>approval_mode</code>
                             y frontends en tiempo real con AG-UI Protocol.
                         </p>
                         <div class="phase-tags">
@@ -1747,7 +2088,7 @@
                 <h2 class="section-title">En 5 Minutos</h2>
                 <p class="section-description">De cero a tu primer agente funcionando.</p>
             </div>
-            
+
             <div class="quickstart-grid">
                 <div class="qs-step">
                     <div class="qs-number">1</div>
@@ -1756,7 +2097,7 @@
                         <code>git clone https://github.com/mars-expedition/mars-mission-labs.git</code>
                     </div>
                 </div>
-                
+
                 <div class="qs-step">
                     <div class="qs-number">2</div>
                     <div class="qs-content">
@@ -1790,24 +2131,27 @@
             <div class="footer-links">
                 <a href="https://learn.microsoft.com/agent-framework" target="_blank">
                     <!-- Book icon -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
                     Documentación MAF
                 </a>
                 <a href="https://github.com/microsoft/agent-framework" target="_blank">
                     <!-- GitHub icon -->
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                     </svg>
                     GitHub Framework
                 </a>
                 <a href="https://docs.ag-ui.com" target="_blank">
                     <!-- Monitor icon -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2"/>
-                        <path d="M8 21h8M12 17v4"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <path d="M8 21h8M12 17v4" />
                     </svg>
                     AG-UI Protocol
                 </a>
@@ -1841,7 +2185,7 @@
         function initStars() {
             stars = [];
             const numStars = Math.floor((canvas.width * canvas.height) / 4000);
-            
+
             for (let i = 0; i < numStars; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
@@ -1849,8 +2193,8 @@
                     radius: Math.random() * 1.5 + 0.5,
                     opacity: Math.random() * 0.8 + 0.2,
                     twinkleSpeed: Math.random() * 0.02 + 0.005,
-                    color: Math.random() > 0.85 ? 
-                        `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : 
+                    color: Math.random() > 0.85 ?
+                        `hsl(${Math.random() * 40 + 15}, 80%, 75%)` :
                         '#ffffff'
                 });
             }
@@ -1878,7 +2222,7 @@
 
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                ctx.fillStyle = star.color === '#ffffff' ? 
+                ctx.fillStyle = star.color === '#ffffff' ?
                     `rgba(255, 255, 255, ${star.opacity})` :
                     star.color.replace('75%)', `${star.opacity * 75}%)`);
                 ctx.fill();
@@ -1922,7 +2266,7 @@
 
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -2103,4 +2447,5 @@
         });
     </script>
 </body>
+
 </html>

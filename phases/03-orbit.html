@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORBIT - MISIÓN MARTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --bg-space: #0a0612;
+            --mars-orange: #ff6b35;
+            --mars-red: #ff3b30;
+            --mars-light: #ff9f68;
+            --mars-glow: #ffcba4;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.75);
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        details.free-option {
+            margin: 20px 0;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 0 20px;
+        }
+        details.free-option > summary {
+            cursor: pointer;
+            padding: 16px 0;
+            font-weight: 600;
+            color: var(--mars-light);
+            list-style: none;
+        }
+        details.free-option > summary::-webkit-details-marker { display: none; }
+        details.free-option > summary::before { content: "\25B8  "; color: var(--mars-orange); }
+        details.free-option[open] > summary::before { content: "\25BE  "; }
+        details.free-option[open] > summary {
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 14px;
+        }
+        details.free-option ol { padding-left: 20px; margin: 8px 0; }
+
+        .content-panel p a,
+        .content-panel li a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.45);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .content-panel p a:hover,
+        .content-panel li a:hover {
+            color: var(--mars-orange);
+            border-bottom-color: var(--mars-orange);
+        }
+
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--mars-light);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+        .copy-btn:hover { background: rgba(255, 107, 53, 0.3); }
+        .copy-btn.copied {
+            color: #7CFC98;
+            border-color: rgba(124, 252, 152, 0.5);
+            background: rgba(124, 252, 152, 0.12);
+            opacity: 1;
+        }
+
+        /* Instrucción pegada a su caja de comando */
+        .content-panel p:has(+ pre) {
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.92rem;
+        }
+        .content-panel p:has(+ pre) + pre {
+            margin-top: 0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: var(--bg-space);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 6, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ff9f68, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .nav-back {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none; font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-back:hover { color: var(--mars-orange); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 40px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 50px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .phase-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            padding: 10px 18px; border-radius: 100px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;
+            color: var(--mars-light); margin-bottom: 24px;
+        }
+        .phase-badge svg { width: 18px; height: 18px; }
+
+        .phase-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #ffcba4, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .phase-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem; font-weight: 600;
+            margin: 50px 0 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+            color: var(--mars-light);
+        }
+        h3 {
+            font-size: 1.1rem; font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--mars-orange);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px; margin: 28px 0;
+        }
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            text-align: center;
+        }
+        .concept-card svg { width: 40px; height: 40px; margin-bottom: 12px; }
+        .concept-card h4 {
+            font-size: 1rem; color: var(--mars-orange); margin: 0 0 10px; font-weight: 600;
+        }
+        .concept-card p {
+            font-size: 0.85rem; margin: 0; line-height: 1.5;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 24px !important;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--mars-light);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, rgba(255,159,104,0.08), rgba(255,107,53,0.08));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 104, 0.25);
+            border-radius: 18px;
+            padding: 32px; margin: 50px 0;
+        }
+        .checkpoint h3 {
+            color: var(--mars-glow);
+            margin-top: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .checkpoint h3 svg { width: 24px; height: 24px; }
+        .checkpoint ul {
+            list-style: none; padding: 0;
+            margin-top: 16px;
+        }
+        .checkpoint li {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin: 12px 0; color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; margin-top: 4px; }
+        .checkpoint li span { flex: 1; }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between;
+            margin-top: 50px; padding-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .nav-btn {
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            padding: 15px 26px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.74rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -130%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .nav-btn:hover::before { left: 150%; }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-btn:focus-visible { outline: 2px solid var(--mars-glow); outline-offset: 3px; }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
+            border: none;
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.35));
+        }
+        .nav-btn.primary:hover { filter: drop-shadow(0 8px 22px rgba(255, 107, 53, 0.5)); }
+        .nav-btn svg { width: 18px; height: 18px; }
+        .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        .simulation-note {
+            border-left: 3px solid var(--mars-orange);
+            background: rgba(255, 107, 53, 0.08);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 0 0 28px;
+        }
+        .guide-toc { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 32px; }
+        .guide-toc a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border: 1px solid var(--panel-border);
+            border-radius: 100px;
+            padding: 7px 13px;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+        }
+        .guide-toc a:hover, .guide-toc a:focus-visible {
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .content-panel h2[id], .checkpoint[id] { scroll-margin-top: 100px; }
+        .prompt-list { padding-left: 24px; margin: 12px 0 24px; color: var(--text-secondary); }
+        .prompt-list li { margin: 8px 0; }
+
+        @media (max-width: 600px) {
+            .concept-grid { grid-template-columns: 1fr; }
+            .copy-btn { opacity: 1; }
+        }
+        @media (hover: none) {
+            .copy-btn { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .page-content { padding: 100px 16px 40px; }
+            .content-panel { padding: 30px 24px; }
+            .phase-title { font-size: 1.6rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+            </svg>
+            MISIÓN MARTE
+        </a>
+        <a href="../index.html#expedicion" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver a la expedición
+        </a>
+    </nav>
+
+    <div class="page-content">
+        <div class="content-panel">
+            <div class="phase-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="8"/>
+                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(60 12 12)"/>
+                    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(-60 12 12)"/>
+                    <circle cx="12" cy="12" r="2" fill="rgba(255,107,53,0.5)"/>
+                </svg>
+                FASE 03 · ORBIT
+            </div>
+            <h1 class="phase-title">Órbita: RAG con Azure AI Search</h1>
+            <p class="phase-description">
+                Órbita estable alcanzada. Conecta tus agentes autónomos a una base documental de misiones reales a Marte. 
+                Aprende a implementar RAG (Retrieval-Augmented Generation) de extremo a extremo: desde la descarga de documentos 
+                y almacenamiento en Azure Blob Storage, hasta la indexación híbrida con embeddings vectoriales, reordenamiento semántico 
+                y orquestación con Microsoft Agent Framework y Azure AI Foundry.
+            </p>
+            <p class="simulation-note">
+                En esta fase trabajamos con press kits y reportes oficiales de la NASA sobre misiones históricas (Perseverance, Curiosity, 
+                InSight, MAVEN, MRO y Phoenix). El agente utilizará Azure AI Search como herramienta de recuperación para formular 
+                respuestas verificables, citando página y fuente documental sin alucinar.
+            </p>
+
+            <nav class="guide-toc" aria-label="Contenido de la fase">
+                <a href="#preparacion">Preparación</a>
+                <a href="#conceptos">Conceptos clave</a>
+                <a href="#paso1">1 · Descarga de datos</a>
+                <a href="#paso2">2 · Blob Storage</a>
+                <a href="#paso3">3 · Índice y Chunking</a>
+                <a href="#paso4">4 · Agente con RAG</a>
+                <a href="#paso5">5 · Comparación y Reranker</a>
+                <a href="#paso6">6 · Agente en Foundry</a>
+                <a href="#checkpoint">Checkpoint</a>
+            </nav>
+
+            <h2 id="preparacion">Preparación del Entorno</h2>
+            <p>
+                Para esta fase necesitas <strong>Python 3.10 o superior</strong>, Azure CLI instalado y acceso a los siguientes 
+                recursos en Azure:
+            </p>
+            <ul>
+                <li><strong>Azure OpenAI / AI Foundry:</strong> despliegues de un modelo de chat (p.ej. <code>gpt-4o-mini</code>) y de embeddings (<code>text-embedding-3-small</code>).</li>
+                <li><strong>Azure AI Search:</strong> servicio de búsqueda con soporte semántico (Semantic Ranker).</li>
+                <li><strong>Azure Storage Account:</strong> contenedor de blobs (<code>mars-rag</code>) para almacenar los PDFs originales.</li>
+                <li><strong>Azure AI Foundry Project:</strong> (opcional, para el paso 6) proyecto con conexión registrada hacia Azure AI Search.</li>
+            </ul>
+
+            <p>Trabajando desde la carpeta <code>phases/03-orbit</code> en tu repositorio:</p>
+            <pre><code class="language-bash">cd phases/03-orbit
+python -m venv .venv
+# En Windows:
+.\.venv\Scripts\Activate.ps1
+# En Linux/macOS:
+source .venv/bin/activate
+
+pip install --upgrade pip
+pip install -r tutorial/requirements.txt</code></pre>
+
+            <p>Inicia sesión en Azure con tu cuenta o credencial de servicio:</p>
+            <pre><code class="language-bash">az login
+az account set --subscription "&lt;SUBSCRIPTION_ID_O_NOMBRE&gt;"</code></pre>
+
+            <p>Copia el archivo de plantilla <code>.env.example</code> a <code>.env</code> y completa las variables:</p>
+            <pre><code class="language-bash">Copy-Item .env.example .env</code></pre>
+
+            <p>Contenido principal de configuración en tu archivo <code>.env</code>:</p>
+            <pre><code class="language-bash"># Azure OpenAI / Foundry
+AZURE_OPENAI_ENDPOINT=https://&lt;resource-name&gt;.openai.azure.com
+AZURE_OPENAI_API_VERSION=2025-04-01-preview
+AZURE_OPENAI_CHAT_MODEL=&lt;chat-deployment-name&gt;
+AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+AZURE_OPENAI_EMBEDDING_MODEL_NAME=text-embedding-3-small
+AZURE_OPENAI_EMBEDDING_API_VERSION=2025-04-01-preview
+
+# Azure AI Search
+AZURE_SEARCH_ENDPOINT=https://&lt;search-service-name&gt;.search.windows.net
+AZURE_SEARCH_INDEX=rag-nasa-agent-demo
+AZURE_SEARCH_API_VERSION=2025-09-01
+EMBEDDING_DIMENSIONS=1536
+
+# Azure Blob Storage (Recomendado: DefaultAzureCredential con Azure AD)
+AZURE_STORAGE_ACCOUNT_NAME=&lt;storage-account-name&gt;
+AZURE_STORAGE_CONTAINER=mars-rag
+AZURE_STORAGE_BLOB_PREFIX=mars-rag
+
+# Azure AI Search Text Split Skill
+AZURE_SEARCH_TEXT_SPLIT_MODE=pages
+AZURE_SEARCH_TEXT_SPLIT_UNIT=characters
+AZURE_SEARCH_TEXT_SPLIT_MAX_LENGTH=3500
+AZURE_SEARCH_TEXT_SPLIT_OVERLAP=500
+AZURE_SEARCH_TEXT_SPLIT_LANGUAGE=en
+RESET_SEARCH_ASSETS=true
+WAIT_FOR_INDEXER=true
+
+# Azure AI Foundry Native Agent (Paso 6)
+FOUNDRY_PROJECT_ENDPOINT=https://&lt;foundry-project&gt;.services.ai.azure.com/api/projects/&lt;project-name&gt;
+FOUNDRY_AGENT_NAME=marsrag-native-agent</code></pre>
+
+            <details class="free-option">
+                <summary>Permisos RBAC recomendados en Azure (clic para ver detalles)</summary>
+                <p>Si utilizas autenticación con Azure AD (sin connection string estática), asegúrate de contar con los siguientes roles:</p>
+                <ol>
+                    <li><strong>Tu usuario local:</strong> rol <code>Storage Blob Data Contributor</code> sobre la cuenta de almacenamiento para subir los PDFs en el paso 2.</li>
+                    <li><strong>Identidad administrada de Azure AI Search:</strong> rol <code>Storage Blob Data Reader</code> sobre la cuenta de almacenamiento para que el indexer lea los blobs.</li>
+                    <li><strong>Identidad administrada de Azure AI Search:</strong> rol <code>Cognitive Services OpenAI User</code> sobre Azure OpenAI si no defines <code>AZURE_OPENAI_API_KEY</code>.</li>
+                </ol>
+            </details>
+
+            <h2 id="conceptos">Conceptos Clave de RAG</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <circle cx="24" cy="24" r="18"/>
+                        <path d="M16 24h16M24 16v16"/>
+                        <circle cx="24" cy="24" r="6" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>RAG</h4>
+                    <p>Retrieval-Augmented Generation: el agente extrae evidencia relevante desde documentos antes de generar la respuesta.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="8" y="10" width="32" height="28" rx="4"/>
+                        <path d="M14 18h20M14 24h12M14 30h16"/>
+                        <circle cx="36" cy="32" r="5" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>Chunking</h4>
+                    <p>División del texto en fragmentos (chunks) con solapamiento (overlap) para mantener el contexto semántico exacto.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <path d="M8 38 L20 12 L30 28 L40 16"/>
+                        <circle cx="20" cy="12" r="3" fill="#ff6b35"/>
+                        <circle cx="30" cy="28" r="3" fill="#ff6b35"/>
+                    </svg>
+                    <h4>Búsqueda Híbrida</h4>
+                    <p>Combina búsqueda léxica (BM25 por palabras clave) con búsqueda vectorial (embeddings semánticos densos).</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <path d="M10 14h28M14 24h20M18 34h12"/>
+                        <path d="M38 34l4-4-4-4"/>
+                    </svg>
+                    <h4>Semantic Ranker</h4>
+                    <p>Modelo de Deep Learning (L2) que reordena los resultados según su relevancia semántica real con la pregunta.</p>
+                </div>
+            </div>
+
+            <h2 id="paso1">Paso 1 · Descarga de Documentos Fuente</h2>
+            <p>
+                El script <code>tutorial/01_download_data.py</code> se encarga de descargar 7 press kits oficiales de la NASA 
+                hacia la carpeta local <code>data/</code> y genera el archivo <code>data/metadata.json</code> con el título, 
+                nombre de archivo, URL original y categoría de cada misión.
+            </p>
+            <p>Código del script <code>tutorial/01_download_data.py</code>:</p>
+            <pre><code class="language-python">import os
+import json
+import httpx
+from pathlib import Path
+from dotenv import load_dotenv
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PHASE_DIR = SCRIPT_DIR.parent
+load_dotenv(PHASE_DIR / ".env")
+
+DATA_DIR = PHASE_DIR / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+MARS_DOCUMENTS = [
+    {
+        "title": "Mars 2020 Perseverance Launch Press Kit",
+        "filename": "mars-2020-launch-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/download/mars_2020_launch_press_kit.pdf",
+        "category": "robotic-mission",
+        "mission": "Perseverance",
+    },
+    {
+        "title": "Mars 2020 Perseverance Landing Press Kit",
+        "filename": "mars-2020-landing-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/download/mars_2020_landing_press_kit.pdf",
+        "category": "robotic-mission",
+        "mission": "Perseverance",
+    },
+    {
+        "title": "Mars Science Laboratory Curiosity Landing Press Kit",
+        "filename": "curiosity-landing-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/MSLLanding.pdf",
+        "category": "robotic-mission",
+        "mission": "Curiosity",
+    },
+    {
+        "title": "Mars Reconnaissance Orbiter Launch Press Kit",
+        "filename": "mro-launch-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mro-launch.pdf",
+        "category": "robotic-mission",
+        "mission": "Mars Reconnaissance Orbiter",
+    },
+    {
+        "title": "MAVEN Press Kit",
+        "filename": "maven-press-kit.pdf",
+        "url": "https://www.nasa.gov/wp-content/uploads/2015/03/maven_presskit_final2.pdf",
+        "category": "robotic-mission",
+        "mission": "MAVEN",
+    },
+    {
+        "title": "Mars InSight Landing Press Kit",
+        "filename": "insight-landing-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/insight/landing/download/mars_insight_landing_presskit.pdf",
+        "category": "robotic-mission",
+        "mission": "InSight",
+    },
+    {
+        "title": "Phoenix Mars Lander Launch Press Kit",
+        "filename": "phoenix-launch-press-kit.pdf",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/phoenix-launch-presskit.pdf",
+        "category": "robotic-mission",
+        "mission": "Phoenix",
+    }
+]
+
+print(f"--- Iniciando descarga de documentos en '{DATA_DIR}/' ---")
+
+headers = {"User-Agent": "azure-rag-agent-framework-demo"}
+downloaded_metadata = []
+
+with httpx.Client(follow_redirects=True, timeout=180.0, headers=headers) as client:
+    for document in MARS_DOCUMENTS:
+        local_path = DATA_DIR / document["filename"]
+        
+        if not local_path.exists():
+            print(f"Descargando: {document['title']}...")
+            response = client.get(document["url"])
+            response.raise_for_status()
+            
+            content_type = response.headers.get("content-type", "").lower()
+            if not response.content.startswith(b"%PDF") and "application/pdf" not in content_type:
+                print(f"[ERROR] La descarga de '{document['title']}' no parece ser un PDF.")
+                continue
+                
+            local_path.write_bytes(response.content)
+        else:
+            print(f"[SKIP] El archivo '{document['filename']}' ya existe.")
+            
+        downloaded_metadata.append(document)
+
+metadata_path = DATA_DIR / "metadata.json"
+with open(metadata_path, "w", encoding="utf-8") as f:
+    json.dump(downloaded_metadata, f, indent=2, ensure_ascii=False)
+
+print(f"\nDescarga completada! {len(downloaded_metadata)} documentos listos.")
+print(f"Metadata guardada en: {metadata_path}")</code></pre>
+
+            <p>Ejecución del paso 1:</p>
+            <pre><code class="language-bash">python tutorial/01_download_data.py</code></pre>
+
+            <h2 id="paso2">Paso 2 · Publicación en Azure Blob Storage</h2>
+            <p>
+                <code>tutorial/02_prepare_and_embed.py</code> toma los PDFs descargados y los carga al contenedor 
+                de Azure Blob Storage (<code>AZURE_STORAGE_CONTAINER</code>). Al subir cada PDF, inyecta los metadatos 
+                de negocio (título, misión, categoría, URL de fuente) directamente en las propiedades del blob y genera 
+                el archivo <code>data/blob_manifest.json</code>.
+            </p>
+            <p>Código del script <code>tutorial/02_prepare_and_embed.py</code>:</p>
+            <pre><code class="language-python">import json
+import os
+from pathlib import Path
+
+from azure.core.exceptions import HttpResponseError, ResourceExistsError
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient, ContentSettings
+from dotenv import load_dotenv
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PHASE_DIR = SCRIPT_DIR.parent
+load_dotenv(PHASE_DIR / ".env")
+
+DATA_DIR = PHASE_DIR / "data"
+METADATA_FILE = DATA_DIR / "metadata.json"
+OUTPUT_FILE = DATA_DIR / "blob_manifest.json"
+
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+AZURE_STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+AZURE_STORAGE_CONTAINER = os.environ["AZURE_STORAGE_CONTAINER"]
+AZURE_STORAGE_BLOB_PREFIX = os.getenv("AZURE_STORAGE_BLOB_PREFIX", "mars-rag").strip("/")
+
+def create_blob_service() -> BlobServiceClient:
+    if AZURE_STORAGE_CONNECTION_STRING:
+        return BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+    account_url = f"https://{AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
+    return BlobServiceClient(account_url=account_url, credential=DefaultAzureCredential())
+
+def blob_name_for(filename: str) -> str:
+    return f"{AZURE_STORAGE_BLOB_PREFIX}/{filename}" if AZURE_STORAGE_BLOB_PREFIX else filename
+
+def main():
+    print("--- Preparando PDFs para Azure AI Search ---")
+    if not METADATA_FILE.exists():
+        print("No se encontró metadata.json. Ejecuta primero 01_download_data.py")
+        return
+
+    with METADATA_FILE.open("r", encoding="utf-8") as f:
+        downloaded_files = json.load(f)
+
+    blob_service = create_blob_service()
+    container_client = blob_service.get_container_client(AZURE_STORAGE_CONTAINER)
+
+    try:
+        container_client.create_container()
+        print(f"Contenedor creado: {AZURE_STORAGE_CONTAINER}")
+    except ResourceExistsError:
+        print(f"Usando contenedor existente: {AZURE_STORAGE_CONTAINER}")
+
+    manifest = []
+    for document in downloaded_files:
+        filepath = DATA_DIR / document["filename"]
+        if not filepath.exists():
+            continue
+
+        blob_name = blob_name_for(document["filename"])
+        blob_client = container_client.get_blob_client(blob_name)
+        print(f"Subiendo: {document['title']} -> {blob_name}")
+
+        with filepath.open("rb") as pdf_file:
+            blob_client.upload_blob(
+                pdf_file,
+                overwrite=True,
+                metadata={
+                    "title": document["title"],
+                    "source_url": document["url"],
+                    "category": document["category"],
+                    "mission": document["mission"],
+                },
+                content_settings=ContentSettings(content_type="application/pdf"),
+            )
+
+        manifest.append({
+            "title": document["title"],
+            "filename": document["filename"],
+            "blob_name": blob_name,
+            "source_url": document["url"],
+            "category": document["category"],
+            "mission": document["mission"],
+        })
+
+    with OUTPUT_FILE.open("w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+
+    print(f"\nPDFs publicados en Blob Storage: {len(manifest)}")
+    print(f"Manifest guardado en: {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+            <p>Ejecución del paso 2:</p>
+            <pre><code class="language-bash">python tutorial/02_prepare_and_embed.py</code></pre>
+
+            <h2 id="paso3">Paso 3 · Índice Vectorial y Skillset con Azure AI Search</h2>
+            <p>
+                <code>tutorial/03_setup_search_index.py</code> automatiza la configuración de 4 artefactos en Azure AI Search:
+            </p>
+            <ol>
+                <li><strong>Índice Vectorial:</strong> declara campos de texto (<code>content</code>, <code>title</code>, <code>source_url</code>) y un vector de 1536 dimensiones (<code>content_vector</code>) con algoritmo HNSW y configuración de Semantic Ranker (<code>rag-semantic-config</code>).</li>
+                <li><strong>Origen de Datos (Data Source):</strong> conecta con el contenedor de Blob Storage.</li>
+                <li><strong>Skillset:</strong> incluye <code>#Microsoft.Skills.Text.SplitSkill</code> para dividir en páginas o fragmentos de 3500 caracteres con 500 de solapamiento, y <code>#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill</code> para generar los embeddings automáticamente con <code>text-embedding-3-small</code>.</li>
+                <li><strong>Indexer:</strong> orquesta la extracción periódica de PDFs, ejecución del skillset e indexación continua.</li>
+            </ol>
+            <p>Ejecuta la creación del índice y espera a que el indexer complete el procesamiento:</p>
+            <pre><code class="language-bash">python tutorial/03_setup_search_index.py</code></pre>
+
+            <h2 id="paso4">Paso 4 · Agente Autónomo con Herramienta RAG</h2>
+            <p>
+                En <code>tutorial/04_agent_with_rag.py</code> unimos <strong>Microsoft Agent Framework</strong> con el índice de búsqueda.
+                El flujo consta de:
+            </p>
+            <ul>
+                <li><code>recuperar_conocimiento(query)</code>: vectoriza la pregunta con <code>embedding_client</code>, ejecuta búsqueda híbrida en <code>search_client</code> con Semantic Ranker y compone los pasajes recuperados.</li>
+                <li>Decorador <code>@tool(approval_mode="never_require")</code>: convierte la función en una herramienta accesible por el agente.</li>
+                <li><code>chat_client.as_agent()</code>: define el agente con instrucciones explícitas para forzar la consulta a la herramienta antes de responder y exigir la cita de fuentes.</li>
+            </ul>
+            <p>Código del script <code>tutorial/04_agent_with_rag.py</code>:</p>
+            <pre><code class="language-python">import os
+from pathlib import Path
+from typing import Annotated
+from dotenv import load_dotenv
+from pydantic import Field
+from azure.identity import DefaultAzureCredential
+from azure.search.documents.models import VectorizedQuery
+
+from agent_framework import tool
+from agent_framework.openai import OpenAIChatClient, OpenAIEmbeddingClient
+from azure.search.documents.aio import SearchClient
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PHASE_DIR = SCRIPT_DIR.parent
+load_dotenv(PHASE_DIR / ".env")
+
+AZURE_OPENAI_ENDPOINT = os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/")
+CHAT_MODEL = os.environ["AZURE_OPENAI_CHAT_MODEL"]
+EMBEDDING_MODEL = os.environ["AZURE_OPENAI_EMBEDDING_MODEL"]
+AZURE_SEARCH_ENDPOINT = os.environ["AZURE_SEARCH_ENDPOINT"].rstrip("/")
+AZURE_SEARCH_INDEX = os.environ["AZURE_SEARCH_INDEX"]
+
+credential = DefaultAzureCredential()
+
+# 1. Clientes
+chat_client = OpenAIChatClient(model=CHAT_MODEL, azure_endpoint=AZURE_OPENAI_ENDPOINT, credential=credential)
+embedding_client = OpenAIEmbeddingClient(model=EMBEDDING_MODEL, azure_endpoint=AZURE_OPENAI_ENDPOINT, credential=credential)
+search_client = SearchClient(endpoint=AZURE_SEARCH_ENDPOINT, index_name=AZURE_SEARCH_INDEX, credential=credential)
+
+# 2. Recuperación híbrida con Semantic Ranker
+async def recuperar_conocimiento(query: str, top_k: int = 5) -> str:
+    """Traduce la pregunta a vector, busca en el índice y aplica Rerank semántico."""
+    emb_resp = await embedding_client.get_embeddings(values=[query])
+    vector = emb_resp[0].vector
+    vector_query = VectorizedQuery(vector=vector, k_nearest_neighbors=10, fields="content_vector")
+    
+    results = await search_client.search(
+        search_text=query,
+        vector_queries=[vector_query],
+        select=["title", "content", "source_url"],
+        query_type="semantic",
+        semantic_configuration_name="rag-semantic-config",
+        top=top_k,
+    )
+    
+    passages = []
+    async for item in results:
+        passages.append(
+            f"Título: {item['title']}\n"
+            f"Fuente: {item['source_url']}\n"
+            f"Contenido: {item['content']}"
+        )
+        
+    return "\n\n---\n\n".join(passages) if passages else "NO_SE_ENCONTRO_EVIDENCIA"
+
+# 3. Herramienta (Tool) para el Agente
+@tool(approval_mode="never_require")
+async def buscar_en_base_documental(
+    pregunta: Annotated[str, Field(description="Pregunta sobre misiones a Marte para buscar en la base documental.")]
+) -> str:
+    """Busca evidencia relevante en la base de datos de misiones a Marte."""
+    print(f"\n[TOOL] El agente está buscando: '{pregunta}'...")
+    return await recuperar_conocimiento(pregunta)
+
+# 4. Agente con instrucciones estrictas de grounding
+instrucciones_agente = """
+Eres un asistente RAG especializado en documentos de misiones a Marte de la NASA.
+Reglas:
+1. Siempre llama a la herramienta de búsqueda antes de responder.
+2. Responde SOLO con la información recuperada de los fragmentos.
+3. Si no encuentras la respuesta, di "No encuentro evidencia suficiente".
+4. Al final de tu respuesta, lista tus "Fuentes" citando el Título del documento.
+"""
+
+agente_rag = chat_client.as_agent(
+    name="MarsRAG_Agent",
+    instructions=instrucciones_agente,
+    tools=[buscar_en_base_documental],
+)
+
+# 5. Ejecución
+async def main():
+    print("=== PROBANDO EL AGENTE RAG ===")
+    pregunta = "¿Qué instrumento del rover Curiosity utiliza un láser para vaporizar rocas?"
+    
+    print(f"\nPregunta del Usuario: {pregunta}")
+    print("Esperando que el Agente analice, consulte la herramienta y formule respuesta...\n")
+    
+    respuesta = await agente_rag.run(pregunta)
+    
+    print("\n=== RESPUESTA FINAL DEL AGENTE ===")
+    print(respuesta.text)
+    
+    await search_client.close()
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())</code></pre>
+
+            <p>Ejecución del paso 4:</p>
+            <pre><code class="language-bash">python tutorial/04_agent_with_rag.py</code></pre>
+
+            <h2 id="paso5">Paso 5 · Comparación: Con y Sin Semantic Reranker</h2>
+            <p>
+                En <code>tutorial/05_agent_comparison.py</code> probamos una consulta compleja contra dos agentes en simultáneo:
+            </p>
+            <ul>
+                <li><strong>Agente 1 (Sin Rerank):</strong> utiliza búsqueda híbrida estándar (BM25 + Vector). Puede clasificar primero documentos por coincidencia de palabras clave aunque no contengan la respuesta exacta.</li>
+                <li><strong>Agente 2 (Con Semantic Reranker):</strong> pasa los mejores candidatos por el modelo L2 de Azure AI Search, elevando a las primeras posiciones el fragmento con la respuesta conceptual certera.</li>
+            </ul>
+            <p>Pregunta de evaluación:</p>
+            <p><em>«¿Qué misión busca señales de vida antigua en el cráter Jezero?»</em></p>
+            <p>Ejecuta la comparación para observar la diferencia en precisión y fundamentación:</p>
+            <pre><code class="language-bash">python tutorial/05_agent_comparison.py</code></pre>
+
+            <h2 id="paso6">Paso 6 · Agente Nativo en Azure AI Foundry</h2>
+            <p>
+                En <code>tutorial/06_native_foundry_agent.py</code> llevamos la arquitectura a producción utilizando 
+                <strong>Azure AI Foundry Projects</strong> y la API v2 de agentes (<code>create_version</code>):
+            </p>
+            <ul>
+                <li>Utiliza <code>AIProjectClient</code> autenticado con <code>DefaultAzureCredential</code>.</li>
+                <li>Localiza la conexión de Azure AI Search registrada en el proyecto de Foundry.</li>
+                <li>Configura un <code>AzureAISearchTool</code> directamente vinculado al índice.</li>
+                <li>Define un esquema JSON estructurado con <code>TextResponseFormatJsonSchema</code> para obligar al agente a devolver tanto el texto de la respuesta como la lista tipada de chunks con puntajes y metadatos de fuente.</li>
+            </ul>
+            <p>Ejecución del paso 6:</p>
+            <pre><code class="language-bash">python tutorial/06_native_foundry_agent.py</code></pre>
+            <p>
+                Al terminar la ejecución, podrás entrar al portal de <strong>Azure AI Foundry</strong>, pestaña 
+                <strong>Agents</strong>, y ver tu agente publicado listo para su consumo vía REST o SDK.
+            </p>
+
+            <div class="checkpoint" id="checkpoint">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Checkpoint: ORBIT completo
+                </h3>
+                <p>Antes de avanzar a la siguiente fase, verifica que dominas los siguientes hitos:</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Comprender el ciclo de vida de RAG: ingesta, chunking, vectorización, recuperación híbrida y síntesis.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Publicar documentos con metadatos en Azure Blob Storage y construir un índice vectorial en Azure AI Search.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Configurar Text Split Skill y Azure OpenAI Embedding Skill dentro del indexer.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Integrar la búsqueda como una herramienta (<code>@tool</code>) dentro de Microsoft Agent Framework con control de alucinaciones.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Evaluar el beneficio del Semantic Ranker en consultas complejas.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Crear y probar un agente nativo en Azure AI Foundry con respuestas estructuradas en JSON.</span></li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="02-launch.html" class="nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver a LAUNCH
+                </a>
+                <span class="nav-btn primary disabled">
+                    Próximamente: TRANSIT
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Estrellas animadas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.85 ? `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : '#ffffff'
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * star.twinkleSpeed) * 0.01;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color === '#ffffff' ?
+                    `rgba(255, 255, 255, ${star.opacity})` : star.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => { resizeCanvas(); animate(); });
+
+        // Botón "Copiar" en cada bloque de código
+        document.querySelectorAll('pre').forEach((pre) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.type = 'button';
+            btn.textContent = 'Copiar';
+            btn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code ? code.innerText : pre.innerText).replace(/\s+$/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = '¡Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copiar';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+            pre.appendChild(btn);
+        });
+    </script>
+</body>
+</html>

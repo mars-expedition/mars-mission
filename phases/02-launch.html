@@ -256,11 +256,12 @@
             margin-top: 16px;
         }
         .checkpoint li {
-            display: flex; align-items: center; gap: 12px;
+            display: flex; align-items: flex-start; gap: 12px;
             margin: 12px 0; color: var(--text-secondary);
             font-size: 0.95rem;
         }
-        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; margin-top: 4px; }
+        .checkpoint li span { flex: 1; }
 
         .nav-buttons {
             display: flex; justify-content: space-between;
@@ -862,10 +863,10 @@ if __name__ == "__main__":
                 </h3>
                 <p>Antes de avanzar, verifica que puedes:</p>
                 <ul>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Registrar funciones Python con <code>tools=[...]</code> y probar sus resultados.</li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Distinguir la hora real de los datos simulados y del cálculo simplificado.</li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Identificar la herramienta, el recurso y el prompt del servidor MCP.</li>
-                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Ejecutar el chat MCP y hacer una pregunta de seguimiento en la misma sesión.</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Registrar funciones Python con <code>tools=[...]</code> y probar sus resultados.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Distinguir la hora real de los datos simulados y del cálculo simplificado.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Identificar la herramienta, el recurso y el prompt del servidor MCP.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Ejecutar el chat MCP y hacer una pregunta de seguimiento en la misma sesión.</span></li>
                 </ul>
             </div>
 
@@ -877,13 +878,13 @@ if __name__ == "__main__":
                     </svg>
                     Volver a IGNITION
                 </a>
-                <span class="nav-btn primary disabled">
-                    Próximamente: ORBIT
+                <a href="03-orbit.html" class="nav-btn primary">
+                    Siguiente: ORBIT
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
-                </span>
+                </a>
             </div>
         </div>
     </div>

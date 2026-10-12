@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRANSIT - MISIÓN MARTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --bg-space: #0a0612;
+            --mars-orange: #ff6b35;
+            --mars-red: #ff3b30;
+            --mars-light: #ff9f68;
+            --mars-glow: #ffcba4;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.75);
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        details.free-option {
+            margin: 20px 0;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 0 20px;
+        }
+        details.free-option > summary {
+            cursor: pointer;
+            padding: 16px 0;
+            font-weight: 600;
+            color: var(--mars-light);
+            list-style: none;
+        }
+        details.free-option > summary::-webkit-details-marker { display: none; }
+        details.free-option > summary::before { content: "\25B8  "; color: var(--mars-orange); }
+        details.free-option[open] > summary::before { content: "\25BE  "; }
+        details.free-option[open] > summary {
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 14px;
+        }
+        details.free-option ol { padding-left: 20px; margin: 8px 0; }
+
+        .content-panel p a,
+        .content-panel li a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.45);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .content-panel p a:hover,
+        .content-panel li a:hover {
+            color: var(--mars-orange);
+            border-bottom-color: var(--mars-orange);
+        }
+
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--mars-light);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+        .copy-btn:hover { background: rgba(255, 107, 53, 0.3); }
+        .copy-btn.copied {
+            color: #7CFC98;
+            border-color: rgba(124, 252, 152, 0.5);
+            background: rgba(124, 252, 152, 0.12);
+            opacity: 1;
+        }
+
+        /* Instrucción pegada a su caja de comando */
+        .content-panel p:has(+ pre) {
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.92rem;
+        }
+        .content-panel p:has(+ pre) + pre {
+            margin-top: 0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: var(--bg-space);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 6, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ff9f68, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .nav-back {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none; font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-back:hover { color: var(--mars-orange); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 40px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 50px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .phase-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            padding: 10px 18px; border-radius: 100px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;
+            color: var(--mars-light); margin-bottom: 24px;
+        }
+        .phase-badge svg { width: 18px; height: 18px; }
+
+        .phase-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #ffcba4, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .phase-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem; font-weight: 600;
+            margin: 50px 0 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+            color: var(--mars-light);
+        }
+        h3 {
+            font-size: 1.1rem; font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--mars-orange);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px; margin: 28px 0;
+        }
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            text-align: center;
+        }
+        .concept-card svg { width: 40px; height: 40px; margin-bottom: 12px; }
+        .concept-card h4 {
+            font-size: 1rem; color: var(--mars-orange); margin: 0 0 10px; font-weight: 600;
+        }
+        .concept-card p {
+            font-size: 0.85rem; margin: 0; line-height: 1.5;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 24px !important;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--mars-light);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, rgba(255,159,104,0.08), rgba(255,107,53,0.08));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 104, 0.25);
+            border-radius: 18px;
+            padding: 32px; margin: 50px 0;
+        }
+        .checkpoint h3 {
+            color: var(--mars-glow);
+            margin-top: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .checkpoint h3 svg { width: 24px; height: 24px; }
+        .checkpoint ul {
+            list-style: none; padding: 0;
+            margin-top: 16px;
+        }
+        .checkpoint li {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin: 12px 0; color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; margin-top: 4px; }
+        .checkpoint li span { flex: 1; }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between;
+            margin-top: 50px; padding-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .nav-btn {
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            padding: 15px 26px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.74rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -130%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .nav-btn:hover::before { left: 150%; }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-btn:focus-visible { outline: 2px solid var(--mars-glow); outline-offset: 3px; }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
+            border: none;
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.35));
+        }
+        .nav-btn.primary:hover { filter: drop-shadow(0 8px 22px rgba(255, 107, 53, 0.5)); }
+        .nav-btn svg { width: 18px; height: 18px; }
+        .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        .simulation-note {
+            border-left: 3px solid var(--mars-orange);
+            background: rgba(255, 107, 53, 0.08);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 0 0 28px;
+        }
+        .guide-toc { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 32px; }
+        .guide-toc a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border: 1px solid var(--panel-border);
+            border-radius: 100px;
+            padding: 7px 13px;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+        }
+        .guide-toc a:hover, .guide-toc a:focus-visible {
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .content-panel h2[id], .checkpoint[id] { scroll-margin-top: 100px; }
+        .prompt-list { padding-left: 24px; margin: 12px 0 24px; color: var(--text-secondary); }
+        .prompt-list li { margin: 8px 0; }
+
+        @media (max-width: 600px) {
+            .concept-grid { grid-template-columns: 1fr; }
+            .copy-btn { opacity: 1; }
+        }
+        @media (hover: none) {
+            .copy-btn { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .page-content { padding: 100px 16px 40px; }
+            .content-panel { padding: 30px 24px; }
+            .phase-title { font-size: 1.6rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+            </svg>
+            MISIÓN MARTE
+        </a>
+        <a href="../index.html#expedicion" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver a la expedición
+        </a>
+    </nav>
+
+    <div class="page-content">
+        <div class="content-panel">
+            <div class="phase-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="5" cy="12" r="3" fill="rgba(74,144,217,0.4)" stroke="#4a90d9"/>
+                    <circle cx="19" cy="12" r="3" fill="rgba(255,107,53,0.4)"/>
+                    <path d="M8 12h8" stroke-dasharray="2 2"/>
+                    <path d="M14 9l3 3-3 3"/>
+                </svg>
+                FASE 04 · TRANSIT
+            </div>
+            <h1 class="phase-title">Tránsito: Sesiones y Middleware</h1>
+            <p class="phase-description">
+                7 meses en el espacio profundo. Haz que tu agente recuerde la conversación entre turnos con sesiones,
+                observa cada paso de su ejecución con middleware de agente, de función y de chat, y protege una maniobra
+                crítica con una autorización que se guarda en la sesión.
+            </p>
+            <p class="simulation-note">
+                En esta fase el agente es el Control de Misión de una expedición a Marte. La nave Quilla-7, la telemetría,
+                el código de la comandante (<code>ORION-4421</code>) y las maniobras son simulados: las tools devuelven datos
+                inventados y no encienden ningún motor real.
+            </p>
+
+            <nav class="guide-toc" aria-label="Contenido de la fase">
+                <a href="#preparacion">Preparación</a>
+                <a href="#conceptos">Conceptos clave</a>
+                <a href="#paso1">1 · Multiturno</a>
+                <a href="#paso2">2 · Middleware</a>
+                <a href="#paso3">3 · Autorización por sesión</a>
+                <a href="#checkpoint">Checkpoint</a>
+            </nav>
+
+            <h2 id="preparacion">Preparación del Entorno</h2>
+            <p>
+                Para esta fase necesitas <strong>Python 3.12 o superior</strong>, <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a>
+                instalado y un recurso de <strong>Azure OpenAI</strong> con una implementación del modelo <code>gpt-5-mini</code>.
+            </p>
+            <ul>
+                <li><strong>Cliente:</strong> <code>OpenAIChatCompletionClient</code> (API Chat Completions) con clave de API.</li>
+                <li><strong>Versiones:</strong> <code>agent-framework-openai</code> 1.15.0 (<code>agent-framework-core</code> 1.20.0) y <code>python-dotenv</code>.</li>
+            </ul>
+
+            <p>Trabajando desde la carpeta <code>phases/04-transit</code> en tu repositorio, instala las dependencias:</p>
+            <pre><code class="language-bash">cd phases/04-transit
+uv sync</code></pre>
+
+            <p>Copia el archivo de plantilla <code>.env.example</code> a <code>.env</code>:</p>
+            <pre><code class="language-bash"># En Linux/macOS:
+cp .env.example .env
+# En Windows:
+Copy-Item .env.example .env</code></pre>
+
+            <p>Completa las variables de tu archivo <code>.env</code>:</p>
+            <pre><code class="language-bash"># Dirección de tu recurso, SIN /openai/v1 al final
+AZURE_OPENAI_ENDPOINT=https://&lt;recurso&gt;.openai.azure.com/
+AZURE_OPENAI_API_KEY=&lt;tu-clave&gt;
+# Nombre de tu implementación del modelo (p.ej. gpt-5-mini-1)
+AZURE_OPENAI_CHAT_COMPLETION_MODEL=&lt;nombre-de-tu-implementacion&gt;</code></pre>
+            <p>
+                El archivo <code>.env</code> tiene tu clave: no lo subas al repositorio. Cada capítulo tiene un
+                <code>mission_control.py</code> con ayudantes (crea el agente y define las tools) y sus
+                <code>stepN_*.py</code>, que es donde está lo que se enseña.
+            </p>
+
+            <h2 id="conceptos">Conceptos Clave</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="8" y="10" width="24" height="14" rx="4"/>
+                        <rect x="16" y="26" width="24" height="14" rx="4" fill="rgba(255,107,53,0.3)"/>
+                        <path d="M14 17h12M22 33h12"/>
+                    </svg>
+                    <h4>Sesión</h4>
+                    <p>El modelo no recuerda nada entre llamadas. La sesión (<code>AgentSession</code>) guarda el historial de la conversación para que el agente recuerde entre turnos.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <circle cx="24" cy="24" r="18"/>
+                        <circle cx="24" cy="24" r="12"/>
+                        <circle cx="24" cy="24" r="6" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>Middleware</h4>
+                    <p>Función que se mete «en medio» de la ejecución para mirar, cambiar o detener algo. Hay tres tipos: de agente, de función (tools) y de chat (modelo).</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <path d="M8 24h28"/>
+                        <path d="M30 16l8 8-8 8"/>
+                        <circle cx="14" cy="24" r="4" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4><code>call_next()</code></h4>
+                    <p>Deja pasar la ejecución. Lo de antes corre antes del paso; lo de después, cuando terminó. Si no se llama, el paso no se ejecuta.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="12" y="22" width="24" height="18" rx="3"/>
+                        <path d="M17 22v-6a7 7 0 0 1 14 0v6"/>
+                        <circle cx="24" cy="31" r="3" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4><code>session.state</code></h4>
+                    <p>Diccionario de la sesión para guardar datos propios, como una autorización. Dura entre turnos de la misma conversación; una sesión nueva empieza vacía.</p>
+                </div>
+            </div>
+
+            <h2 id="paso1">Paso 1 · Multiturno: el agente recuerda con sesiones</h2>
+            <p>
+                Carpeta <code>chapter01_multi_turn</code>. El modelo no recuerda nada entre llamadas: cada <code>run</code>
+                empieza en blanco. La sesión es la que guarda la conversación para que el agente recuerde entre turnos.
+            </p>
+            <p>Código del ayudante <code>chapter01_multi_turn/mission_control.py</code>, que crea el agente:</p>
+            <pre><code class="language-python">import os
+
+from dotenv import load_dotenv
+from agent_framework import Agent
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()  # carga las variables del .env (lo busca subiendo de carpeta)
+
+INSTRUCTIONS = (
+    "Eres el Control de Misión de una expedición a Marte "
+    "y das informes técnicos a la tripulación. Usa terminología espacial. "
+    "Responde siempre en una o dos líneas. "
+    "Si no tienes un dato, dilo; no lo inventes."  # evita que adivine lo que no sabe
+)
+
+
+def create_mission_control() -> Agent:
+    client = OpenAIChatCompletionClient(
+        model=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),  # nombre de tu implementación
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),  # dirección de tu recurso de Azure OpenAI
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),  # clave de API
+    )
+    return Agent(
+        client=client,
+        name="MissionControl",
+        instructions=INSTRUCTIONS
+    )  # crea el agente con el cliente</code></pre>
+
+            <h3>1.1 · Sin sesión, el agente olvida</h3>
+            <p>Dos turnos sin sesión: el segundo <code>run</code> no recibe el primero.</p>
+            <p>Código del script <code>chapter01_multi_turn/step1_without_session.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    mission_control = create_mission_control()
+
+    response = await mission_control.run("Soy la comandante Ana Torres y mi nave se llama Quilla-7.")
+    print(f"CONTROL: {response.text}")
+    print()
+
+    response = await mission_control.run("¿Cómo se llama mi nave?")  # sin sesión: no recibe el turno anterior
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_multi_turn/step1_without_session.py</code></pre>
+            <p>Salida de ejemplo (el texto del modelo cambia en cada ejecución):</p>
+            <pre><code class="language-plaintext">CONTROL: Recibido, Comandante Ana Torres; identidad y buque Quilla-7 registrados en Control de Misión.
+Solicito telemetría actual (sistemas, propulsión, hábitat, enlace) para evaluación; no dispongo de esos datos.
+
+CONTROL: Control de Misión: no tengo registrado el nombre de su nave en la telemetría ni en los archivos de la misión.
+Envíe el indicativo de misión (callsign) o confirme la placa/matrícula de la nave para registrarlo.</code></pre>
+            <p>En el segundo turno no sabe el nombre de la nave, y lo dice en vez de inventarlo.</p>
+
+            <h3>1.2 · Con sesión, el agente recuerda</h3>
+            <p>
+                Los mismos dos turnos, con la misma sesión en ambos: se crea con <code>create_session()</code>
+                y se pasa en cada <code>run</code> con <code>session=</code>.
+            </p>
+            <p>Código del script <code>chapter01_multi_turn/step2_with_session.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    mission_control = create_mission_control()
+    session = mission_control.create_session()  # guardará el historial de esta conversación
+
+    response = await mission_control.run(
+        "Soy la comandante Ana Torres y mi nave se llama Quilla-7.",
+        session=session,  # el turno se guarda en la sesión
+    )
+    print(f"CONTROL: {response.text}")
+    print()
+
+    response = await mission_control.run("¿Cómo se llama mi nave?", session=session)  # recibe el turno anterior
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_multi_turn/step2_with_session.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">CONTROL: Comandante Ana Torres, Control de Misión confirma recepción de identificador Quilla‑7; indique subsistema o consulta específica para emitir telemetría o diagnóstico técnico.
+
+CONTROL: Comandante Ana Torres, su nave se llama Quilla‑7; Control de Misión confirma identificación y registro de vuelo.</code></pre>
+
+            <h3>1.3 · Qué guardó la sesión</h3>
+            <p>La misma conversación, y al final se imprime lo que guarda la sesión:</p>
+            <ul>
+                <li><code>session.service_session_id</code>: el id que habría si el historial viviera en Azure. <code>None</code> significa que Azure no guarda esta conversación; la guarda la sesión, en tu programa.</li>
+                <li><code>session.state["in_memory"]["messages"]</code>: los mensajes guardados. Cada uno es un <code>Message</code>, con <code>role</code> (quién habló) y <code>text</code>.</li>
+            </ul>
+            <p>Código del script <code>chapter01_multi_turn/step3_session_history.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    mission_control = create_mission_control()
+    session = mission_control.create_session()
+
+    await mission_control.run("Soy la comandante Ana Torres y mi nave se llama Quilla-7.", session=session)
+    await mission_control.run("¿Cómo se llama mi nave?", session=session)
+
+    print(f"service_session_id: {session.service_session_id}")  # None: Azure no guarda esta conversación; la guarda la sesión, en tu programa
+    print()
+
+    messages = session.state["in_memory"]["messages"]  # historial guardado en la sesión, en tu programa
+    print(f"Mensajes guardados en la sesión: {len(messages)}")
+    for message in messages:
+        print(f"  {message.role}: {message.text}")  # quién habló y qué dijo
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_multi_turn/step3_session_history.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">service_session_id: None
+
+Mensajes guardados en la sesión: 4
+  user: Soy la comandante Ana Torres y mi nave se llama Quilla-7.
+  assistant: Control de Misión confirma recepción: comandante Ana Torres, nave Quilla-7.
+Información registrada en el manifiesto de tripulación; indique próxima instrucción o requerimiento.
+  user: ¿Cómo se llama mi nave?
+  assistant: Control de Misión confirma: su nave se llama Quilla-7.</code></pre>
+
+            <h2 id="paso2">Paso 2 · Middleware: mirar dentro de cada turno</h2>
+            <p>
+                Carpeta <code>chapter02_middleware</code>. Un middleware es una función con la firma
+                <code>(context, call_next)</code> que se registra en <code>middleware=[...]</code> al crear el agente
+                y aplica a todos sus <code>run</code>. Su tipo se reconoce por la anotación del primer parámetro:
+            </p>
+            <ul>
+                <li><strong>De agente</strong> (<code>AgentContext</code>): envuelve la ejecución completa del agente. Corre una vez por turno.</li>
+                <li><strong>De función</strong> (<code>FunctionInvocationContext</code>): envuelve cada llamada a una tool. Corre una vez por tool usada.</li>
+                <li><strong>De chat</strong> (<code>ChatContext</code>): envuelve cada llamada al modelo. Corre varias veces si hay tools.</li>
+            </ul>
+            <p>
+                El ayudante <code>chapter02_middleware/mission_control.py</code> crea el agente con <code>middleware</code>
+                y <code>tools</code> opcionales, y define la tool <code>get_telemetry</code>. El decorador <code>@tool</code>
+                la convierte en tool, la docstring es la descripción que lee el modelo y <code>Annotated</code> describe el parámetro:
+            </p>
+            <pre><code class="language-python">import os
+from typing import Annotated
+
+from dotenv import load_dotenv
+from agent_framework import Agent, tool
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()  # carga las variables del .env (lo busca subiendo de carpeta)
+
+INSTRUCTIONS = (
+    "Eres el Control de Misión de una expedición a Marte "
+    "y das informes técnicos a la tripulación. Usa terminología espacial. "
+    "Responde siempre en una o dos líneas. "
+    "Si no tienes un dato, dilo; no lo inventes."
+)
+
+TELEMETRY = {
+    "propulsion": "Tanques al 82%, motores principales nominales",
+    "energia": "Baterías al 91%, paneles solares generando 12 kW",
+    "soporte_vital": "O2 21%, CO2 400 ppm, presión de cabina nominal",
+}
+
+
+@tool  # convierte la función en una tool que el modelo puede pedir
+def get_telemetry(
+    system: Annotated[str, "Sistema a consultar: propulsion, energia o soporte_vital"],  # descripción del parámetro para el modelo
+) -> str:
+    """Devuelve la telemetría actual de un sistema de la nave."""
+    return TELEMETRY.get(system, "Sistema desconocido")  # dato simulado
+
+
+def create_mission_control(middleware=None, tools=None) -> Agent:
+    client = OpenAIChatCompletionClient(
+        model=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    )
+    return Agent(
+        client=client,
+        name="MissionControl",
+        instructions=INSTRUCTIONS,
+        middleware=middleware,  # middleware del agente: corre en cada run (None = ninguno)
+        tools=tools,  # tools que el modelo puede pedir (None = ninguna)
+    )</code></pre>
+
+            <h3>2.1 · Middleware de agente</h3>
+            <p>
+                <code>log_turn</code> envuelve cada <code>run</code>: imprime el mensaje que entra, mide el tiempo y,
+                después de <code>call_next()</code>, imprime la respuesta (<code>context.result</code>).
+            </p>
+            <p>Código del script <code>chapter02_middleware/step1_agent_middleware.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+import time
+
+from agent_framework import AgentContext
+
+from mission_control import create_mission_control
+
+
+async def log_turn(context: AgentContext, call_next) -> None:
+    print(f"[AGENTE] Entra: {context.messages[-1].text}")  # último mensaje que entra al agente
+    start = time.perf_counter()  # marca el tiempo antes de ejecutar
+
+    await call_next()  # deja pasar la ejecución: aquí el agente llama al modelo
+
+    elapsed = time.perf_counter() - start  # tiempo que tardó el turno
+    print(f"[AGENTE] Sale en {elapsed:.2f} s: {context.result.text}")  # la respuesta ya existe
+
+
+async def main() -> None:
+    mission_control = create_mission_control(middleware=[log_turn])  # registra el middleware en el agente
+
+    await mission_control.run("Control, solicito el estado general de la misión.")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_middleware/step1_agent_middleware.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">[AGENTE] Entra: Control, solicito el estado general de la misión.
+[AGENTE] Sale en 5.06 s: Control: Estado general nominal — trayectoria y telemetría dentro de parámetros, sin anomalías críticas detectadas.
+Sistemas: propulsión y navegación estables, soporte vital operativo, comunicaciones y energía funcionales; detalles biomédicos y telemetría fina pendientes si los requiere.</code></pre>
+
+            <h3>2.2 · Middleware de función</h3>
+            <p>
+                <code>log_tool_call</code> envuelve cada llamada a una tool: <code>context.function.name</code> es la tool,
+                <code>context.arguments</code> son los datos que pidió el modelo y <code>context.result[0].text</code>
+                es lo que devolvió.
+            </p>
+            <p>Código del script <code>chapter02_middleware/step2_function_middleware.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework import FunctionInvocationContext
+
+from mission_control import create_mission_control, get_telemetry
+
+
+async def log_tool_call(context: FunctionInvocationContext, call_next) -> None:
+    print(f"[TOOL] Llama a {context.function.name} con {context.arguments}")  # tool y datos que pidió el modelo
+
+    await call_next()  # deja pasar la ejecución: aquí se ejecuta la tool
+
+    print(f"[TOOL] Devuelve: {context.result[0].text}")  # resultado de la tool
+
+
+async def main() -> None:
+    mission_control = create_mission_control(
+        middleware=[log_tool_call],  # middleware de función
+        tools=[get_telemetry],  # el modelo puede pedir esta tool
+    )
+
+    response = await mission_control.run("¿Cómo está la propulsión? Consulta la telemetría.")
+    print()
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_middleware/step2_function_middleware.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">[TOOL] Llama a get_telemetry con {'system': 'propulsion'}
+[TOOL] Devuelve: Tanques al 82%, motores principales nominales
+
+CONTROL: Propulsión nominal: tanques al 82%, motores principales en estado nominal.
+No se reportan anomalías; mantendré monitorización continua.</code></pre>
+
+            <h3>2.3 · Middleware de chat</h3>
+            <p>
+                <code>log_model_call</code> envuelve cada llamada al modelo: <code>context.messages</code> son los mensajes
+                enviados en esa llamada y <code>context.result.finish_reason</code> dice por qué terminó
+                (<code>tool_calls</code> = pidió una tool; <code>stop</code> = respuesta final).
+            </p>
+            <p>Código del script <code>chapter02_middleware/step3_chat_middleware.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework import ChatContext
+
+from mission_control import create_mission_control, get_telemetry
+
+
+async def log_model_call(context: ChatContext, call_next) -> None:
+    print(f"[CHAT] Llamada al modelo con {len(context.messages)} mensajes")  # mensajes enviados en esta llamada
+
+    await call_next()  # deja pasar la ejecución: aquí se llama al modelo en Azure
+
+    print(f"[CHAT] El modelo terminó con: {context.result.finish_reason}")  # tool_calls = pide tool; stop = respuesta final
+
+
+async def main() -> None:
+    mission_control = create_mission_control(
+        middleware=[log_model_call],  # middleware de chat
+        tools=[get_telemetry],
+    )
+
+    response = await mission_control.run("¿Cómo está la propulsión? Consulta la telemetría.")
+    print()
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_middleware/step3_chat_middleware.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">[CHAT] Llamada al modelo con 1 mensajes
+[CHAT] El modelo terminó con: tool_calls
+[CHAT] Llamada al modelo con 3 mensajes
+[CHAT] El modelo terminó con: stop
+
+CONTROL: Propulsión nominal: tanques de propergol al 82% y motores principales en estado nominal; sin anomalías reportadas en telemetría.</code></pre>
+            <p>
+                En un solo turno, el modelo se llamó dos veces. Los 3 mensajes de la segunda llamada son: la pregunta,
+                el pedido de tool del modelo y el resultado de la tool.
+            </p>
+
+            <h3>2.4 · Orden de ejecución</h3>
+            <p>
+                Los tres middleware juntos. Las definiciones se copian de los pasos anteriores para que el script
+                solo dependa de <code>mission_control.py</code>.
+            </p>
+            <p>Código del script <code>chapter02_middleware/step4_execution_order.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+import time
+
+from agent_framework import AgentContext, ChatContext, FunctionInvocationContext
+
+from mission_control import create_mission_control, get_telemetry
+
+
+async def log_turn(context: AgentContext, call_next) -> None:
+    print(f"[AGENTE] Entra: {context.messages[-1].text}")
+    start = time.perf_counter()
+
+    await call_next()
+
+    elapsed = time.perf_counter() - start
+    print(f"[AGENTE] Sale en {elapsed:.2f} s: {context.result.text}")
+
+
+async def log_tool_call(context: FunctionInvocationContext, call_next) -> None:
+    print(f"[TOOL] Llama a {context.function.name} con {context.arguments}")
+
+    await call_next()
+
+    print(f"[TOOL] Devuelve: {context.result[0].text}")
+
+
+async def log_model_call(context: ChatContext, call_next) -> None:
+    print(f"[CHAT] Llamada al modelo con {len(context.messages)} mensajes")
+
+    await call_next()
+
+    print(f"[CHAT] El modelo terminó con: {context.result.finish_reason}")
+
+
+async def main() -> None:
+    mission_control = create_mission_control(
+        middleware=[log_turn, log_tool_call, log_model_call],  # agente, función y chat
+        tools=[get_telemetry],
+    )
+
+    await mission_control.run("¿Cómo está la propulsión? Consulta la telemetría.")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_middleware/step4_execution_order.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">[AGENTE] Entra: ¿Cómo está la propulsión? Consulta la telemetría.
+[CHAT] Llamada al modelo con 1 mensajes
+[CHAT] El modelo terminó con: tool_calls
+[TOOL] Llama a get_telemetry con {'system': 'propulsion'}
+[TOOL] Devuelve: Tanques al 82%, motores principales nominales
+[CHAT] Llamada al modelo con 3 mensajes
+[CHAT] El modelo terminó con: stop
+[AGENTE] Sale en 4.25 s: Propulsión nominal: tanques 82% de empuje disponible y motores principales operando dentro de parámetros nominales.</code></pre>
+            <p>
+                Son capas de cebolla: el middleware de agente envuelve todo el turno, y adentro se intercalan
+                las dos llamadas al modelo y la llamada a la tool.
+            </p>
+
+            <h2 id="paso3">Paso 3 · Autorización por sesión</h2>
+            <p>
+                Carpeta <code>chapter03_session_authorization</code>. Junta los dos pasos anteriores para resolver un problema
+                real: sin control, cualquiera en la conversación puede encender los motores. La maniobra se llama
+                <strong>TCM</strong> (Trajectory Correction Maneuver, maniobra de corrección de trayectoria): un encendido corto
+                de motores para corregir el rumbo hacia Marte.
+            </p>
+            <p>El ayudante <code>chapter03_session_authorization/mission_control.py</code> define dos tools:</p>
+            <ul>
+                <li><code>verify_commander_code</code>: compara el código con el registrado y devuelve <code>VALID</code> o <code>INVALID</code>.</li>
+                <li><code>execute_maneuver</code>: «enciende los motores». Imprime <code>[NAVE]</code> para que se vea cuándo se ejecuta de verdad.</li>
+            </ul>
+            <pre><code class="language-python">import os
+from typing import Annotated
+
+from dotenv import load_dotenv
+from agent_framework import Agent, tool
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()  # carga las variables del .env (lo busca subiendo de carpeta)
+
+INSTRUCTIONS = (
+    "Eres el Control de Misión de una expedición a Marte "
+    "y das informes técnicos a la tripulación. Usa terminología espacial. "
+    "Responde siempre en una o dos líneas. "
+    "Si no tienes un dato, dilo; no lo inventes."
+)
+
+COMMANDER_CODE = "ORION-4421"  # código registrado de la comandante (simplificación de la demo)
+
+
+@tool
+def verify_commander_code(
+    code: Annotated[str, "Código de autorización que dio la comandante"],
+) -> str:
+    """Verifica el código de autorización de la comandante."""
+    return "VALID" if code == COMMANDER_CODE else "INVALID"  # compara con el código registrado
+
+
+# TCM = Trajectory Correction Maneuver (maniobra de corrección de trayectoria):
+# encendido corto de motores para corregir el rumbo hacia Marte; el número indica el orden
+@tool
+def execute_maneuver(
+    maneuver: Annotated[str, "Nombre de la maniobra, por ejemplo TCM-3"],
+) -> str:
+    """Enciende los motores para ejecutar una maniobra de la nave."""
+    print(f"[NAVE] Motores encendidos: maniobra {maneuver} ejecutada")  # muestra cuándo se ejecuta de verdad
+    return f"Maniobra {maneuver} ejecutada"
+
+
+def create_mission_control(middleware=None, tools=None) -> Agent:
+    client = OpenAIChatCompletionClient(
+        model=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    )
+    return Agent(
+        client=client,
+        name="MissionControl",
+        instructions=INSTRUCTIONS,
+        middleware=middleware,
+        tools=tools,
+    )</code></pre>
+
+            <h3>3.1 · Sin autorización (el problema)</h3>
+            <p>El agente tiene las dos tools y ningún middleware. Basta pedir la maniobra para que se ejecute: nadie revisa quién la pide.</p>
+            <p>Código del script <code>chapter03_session_authorization/step1_without_authorization.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from mission_control import create_mission_control, execute_maneuver, verify_commander_code
+
+
+async def main() -> None:
+    mission_control = create_mission_control(tools=[verify_commander_code, execute_maneuver])
+    session = mission_control.create_session()
+
+    # TCM = Trajectory Correction Maneuver (maniobra de corrección de trayectoria):
+    # encendido corto de motores para corregir el rumbo hacia Marte; el número indica el orden
+    response = await mission_control.run("Ejecuta la maniobra TCM-3.", session=session)
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter03_session_authorization/step1_without_authorization.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">[NAVE] Motores encendidos: maniobra TCM-3 ejecutada
+CONTROL: Maniobra TCM-3 iniciada y completada con éxito; no se detectaron anomalías durante la ejecución.</code></pre>
+
+            <h3>3.2 · Con autorización por sesión (la solución)</h3>
+            <p><code>require_authorization</code> es un middleware de función que hace dos cosas:</p>
+            <ul>
+                <li><strong>Antes de <code>call_next()</code>:</strong> si la tool es <code>execute_maneuver</code> y la sesión no está autorizada, la bloquea: pone en <code>context.result</code> el texto que recibirá el modelo y sale sin llamar a <code>call_next()</code>.</li>
+                <li><strong>Después de <code>call_next()</code>:</strong> si la tool fue <code>verify_commander_code</code> y devolvió <code>VALID</code>, guarda <code>authorized = True</code> en <code>context.session.state</code>.</li>
+            </ul>
+            <p>
+                La comandante habla tres turnos en la misma sesión. Al final, un tripulante abre otra conversación
+                (sesión nueva) para mostrar que la autorización no se comparte.
+            </p>
+            <p>Código del script <code>chapter03_session_authorization/step2_with_authorization.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework import FunctionInvocationContext
+
+from mission_control import create_mission_control, execute_maneuver, verify_commander_code
+
+
+async def require_authorization(context: FunctionInvocationContext, call_next) -> None:
+    state = context.session.state  # datos de esta conversación: duran entre turnos
+    print(f"[TOOL] Llama a {context.function.name} con {context.arguments}")  # qué tool pidió el modelo y con qué datos
+
+    if context.function.name == "execute_maneuver" and not state.get("authorized"):
+        print("[AUTH] Maniobra bloqueada: la sesión no está autorizada")
+        context.result = "BLOQUEADO: la comandante debe dar su código de autorización primero"  # lo que recibe el modelo
+        print(f"[TOOL] No se ejecuta; el modelo recibe: {context.result}")
+        return  # sin call_next(): la maniobra no se ejecuta
+
+    await call_next()  # deja pasar la ejecución: aquí se ejecuta la tool
+
+    if context.function.name == "verify_commander_code" and context.result[0].text == "VALID":
+        state["authorized"] = True  # la autorización queda guardada en la sesión
+        print("[AUTH] Sesión autorizada")
+    print(f"[TOOL] Devuelve: {context.result[0].text}")  # lo que devolvió la tool al modelo
+
+
+async def main() -> None:
+    mission_control = create_mission_control(
+        middleware=[require_authorization],
+        tools=[verify_commander_code, execute_maneuver],
+    )
+    session = mission_control.create_session()
+
+    # TCM = Trajectory Correction Maneuver (maniobra de corrección de trayectoria):
+    # encendido corto de motores para corregir el rumbo hacia Marte; el número indica el orden
+    for message in (
+        "Ejecuta la maniobra TCM-3.",
+        "Mi código de autorización es ORION-4421.",
+        "Ejecuta también la maniobra TCM-4.",
+    ):  # tres turnos de la comandante, en la misma sesión
+        print(f"COMANDANTE: {message}")
+        response = await mission_control.run(message, session=session)
+        print(f"CONTROL: {response.text}")
+        print()
+
+    print("--- Otra conversación ---")
+    other_session = mission_control.create_session()  # sesión nueva: empieza sin autorización
+    message = "Ejecuta la maniobra TCM-3."
+    print(f"TRIPULANTE: {message}")
+    response = await mission_control.run(message, session=other_session)
+    print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter03_session_authorization/step2_with_authorization.py</code></pre>
+            <p>Salida de ejemplo:</p>
+            <pre><code class="language-plaintext">COMANDANTE: Ejecuta la maniobra TCM-3.
+[TOOL] Llama a execute_maneuver con {'maneuver': 'TCM-3'}
+[AUTH] Maniobra bloqueada: la sesión no está autorizada
+[TOOL] No se ejecuta; el modelo recibe: BLOQUEADO: la comandante debe dar su código de autorización primero
+CONTROL: Maniobra TCM-3 bloqueada: se requiere el código de autorización de la comandante; envíe el código para proceder con la verificación.
+
+COMANDANTE: Mi código de autorización es ORION-4421.
+[TOOL] Llama a verify_commander_code con {'code': 'ORION-4421'}
+[AUTH] Sesión autorizada
+[TOOL] Devuelve: VALID
+[TOOL] Llama a execute_maneuver con {'maneuver': 'TCM-3'}
+[NAVE] Motores encendidos: maniobra TCM-3 ejecutada
+[TOOL] Devuelve: Maniobra TCM-3 ejecutada
+CONTROL: TCM-3 ejecutada con éxito; todos los sistemas nominales.
+
+COMANDANTE: Ejecuta también la maniobra TCM-4.
+[TOOL] Llama a execute_maneuver con {'maneuver': 'TCM-4'}
+[NAVE] Motores encendidos: maniobra TCM-4 ejecutada
+[TOOL] Devuelve: Maniobra TCM-4 ejecutada
+CONTROL: TCM-4 ejecutada con éxito; telemetría confirma parámetros dentro de nominal y sistemas operativos estables.
+
+--- Otra conversación ---
+TRIPULANTE: Ejecuta la maniobra TCM-3.
+[TOOL] Llama a execute_maneuver con {'maneuver': 'TCM-3'}
+[AUTH] Maniobra bloqueada: la sesión no está autorizada
+[TOOL] No se ejecuta; el modelo recibe: BLOQUEADO: la comandante debe dar su código de autorización primero
+CONTROL: TCM-3 bloqueada: necesito el código de autorización de la comandante para proceder; por favor suminístrelo exactamente como fue emitido.</code></pre>
+            <p>Qué muestra cada parte:</p>
+            <ul>
+                <li><strong>Turno 1:</strong> el modelo intenta la maniobra, el middleware la bloquea y el modelo pide el código.</li>
+                <li><strong>Turno 2:</strong> se verifica el código y la sesión queda autorizada. Luego el modelo ejecuta TCM-3 sin que nadie se la vuelva a pedir: la recordó del turno 1 gracias al historial de la sesión, y el middleware la deja pasar.</li>
+                <li><strong>Turno 3:</strong> TCM-4 se ejecuta directo; la autorización se mantuvo entre turnos.</li>
+                <li><strong>Otra conversación:</strong> queda bloqueada; la autorización es de cada sesión, no del agente.</li>
+            </ul>
+
+            <div class="checkpoint" id="checkpoint">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Checkpoint: TRANSIT completo
+                </h3>
+                <p>Antes de avanzar a la siguiente fase, verifica que dominas los siguientes hitos:</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Mantener una conversación multiturno con <code>create_session()</code> y <code>run(..., session=session)</code>.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Explicar dónde vive el historial con Chat Completions: en <code>session.state</code>, dentro de tu programa (<code>service_session_id</code> es <code>None</code>).</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Escribir middleware de agente, de función y de chat, y saber qué intercepta cada uno.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Leer el orden de ejecución de los tres middleware juntos (capas de cebolla).</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Bloquear una tool sin llamar a <code>call_next()</code> y guardar una autorización en <code>session.state</code> que dura entre turnos y no pasa a otra sesión.</span></li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="03-orbit.html" class="nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver a ORBIT
+                </a>
+                <span class="nav-btn primary disabled">
+                    Próximamente: APPROACH
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Estrellas animadas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.85 ? `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : '#ffffff'
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * star.twinkleSpeed) * 0.01;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color === '#ffffff' ?
+                    `rgba(255, 255, 255, ${star.opacity})` : star.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => { resizeCanvas(); animate(); });
+
+        // Botón "Copiar" en cada bloque de código
+        document.querySelectorAll('pre').forEach((pre) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.type = 'button';
+            btn.textContent = 'Copiar';
+            btn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code ? code.innerText : pre.innerText).replace(/\s+$/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = '¡Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copiar';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+            pre.appendChild(btn);
+        });
+    </script>
+</body>
+</html>

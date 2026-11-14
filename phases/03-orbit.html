@@ -938,7 +938,7 @@ if __name__ == "__main__":
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
-            canvas.height = document.body.scrollHeight;
+            canvas.height = window.innerHeight;
             initStars();
         }
 
@@ -968,11 +968,26 @@ if __name__ == "__main__":
                     `rgba(255, 255, 255, ${star.opacity})` : star.color;
                 ctx.fill();
             });
-            requestAnimationFrame(animate);
+            animationFrame = requestAnimationFrame(animate);
         }
 
+        let animationFrame = null;
+        function startAnimation() {
+            if (animationFrame === null) animate();
+        }
+        function stopAnimation() {
+            if (animationFrame !== null) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopAnimation();
+            else startAnimation();
+        });
+
         window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('load', () => { resizeCanvas(); animate(); });
+        window.addEventListener('load', () => { resizeCanvas(); startAnimation(); });
 
         // Botón "Copiar" en cada bloque de código
         document.querySelectorAll('pre').forEach((pre) => {

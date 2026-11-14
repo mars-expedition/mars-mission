@@ -16,7 +16,7 @@ El código de los retos de cada fase vive en su propio repositorio:
 | 02 | LAUNCH | Tools y MCP | ✅ |
 | 03 | ORBIT | RAG y conocimiento | ✅ |
 | 04 | TRANSIT | Sesiones y middleware | ✅ |
-| 05 | APPROACH | Memoria persistente | 🔒 |
+| 05 | APPROACH | Memoria persistente | ✅ |
 | 06 | ENTRY | Observabilidad y evaluación | 🔒 |
 | 07 | DESCENT | Workflows multi-agente | 🔒 |
 | 08 | LANDING | HITL y frontend | 🔒 |

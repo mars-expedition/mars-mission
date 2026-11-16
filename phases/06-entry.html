@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTRY - MISIÓN MARTE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --bg-space: #0a0612;
+            --mars-orange: #ff6b35;
+            --mars-red: #ff3b30;
+            --mars-light: #ff9f68;
+            --mars-glow: #ffcba4;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.75);
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        details.free-option {
+            margin: 20px 0;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 0 20px;
+        }
+        details.free-option > summary {
+            cursor: pointer;
+            padding: 16px 0;
+            font-weight: 600;
+            color: var(--mars-light);
+            list-style: none;
+        }
+        details.free-option > summary::-webkit-details-marker { display: none; }
+        details.free-option > summary::before { content: "\25B8  "; color: var(--mars-orange); }
+        details.free-option[open] > summary::before { content: "\25BE  "; }
+        details.free-option[open] > summary {
+            border-bottom: 1px solid var(--panel-border);
+            margin-bottom: 14px;
+        }
+        details.free-option ol { padding-left: 20px; margin: 8px 0; }
+
+        .content-panel p a,
+        .content-panel li a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.45);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+        .content-panel p a:hover,
+        .content-panel li a:hover {
+            color: var(--mars-orange);
+            border-bottom-color: var(--mars-orange);
+        }
+
+        pre { position: relative; }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--mars-light);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+        .copy-btn:hover { background: rgba(255, 107, 53, 0.3); }
+        .copy-btn.copied {
+            color: #7CFC98;
+            border-color: rgba(124, 252, 152, 0.5);
+            background: rgba(124, 252, 152, 0.12);
+            opacity: 1;
+        }
+
+        /* Instrucción pegada a su caja de comando */
+        .content-panel p:has(+ pre) {
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.92rem;
+        }
+        .content-panel p:has(+ pre) + pre {
+            margin-top: 0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Titillium Web', sans-serif;
+            background: var(--bg-space);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(10, 6, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #ff9f68, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .nav-back {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none; font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-back:hover { color: var(--mars-orange); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            padding: 120px 40px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            padding: 50px 60px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .phase-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,59,48,0.15));
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            padding: 10px 18px; border-radius: 100px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;
+            color: var(--mars-light); margin-bottom: 24px;
+        }
+        .phase-badge svg { width: 18px; height: 18px; }
+
+        .phase-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff, #ffcba4, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .phase-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem; font-weight: 600;
+            margin: 50px 0 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+            color: var(--mars-light);
+        }
+        h3 {
+            font-size: 1.1rem; font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--mars-orange);
+        }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px; margin: 28px 0;
+        }
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            text-align: center;
+        }
+        .concept-card svg { width: 40px; height: 40px; margin-bottom: 12px; }
+        .concept-card h4 {
+            font-size: 1rem; color: var(--mars-orange); margin: 0 0 10px; font-weight: 600;
+        }
+        .concept-card p {
+            font-size: 0.85rem; margin: 0; line-height: 1.5;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 24px !important;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        :not(pre) > code {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--mars-light);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, rgba(255,159,104,0.08), rgba(255,107,53,0.08));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 159, 104, 0.25);
+            border-radius: 18px;
+            padding: 32px; margin: 50px 0;
+        }
+        .checkpoint h3 {
+            color: var(--mars-glow);
+            margin-top: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .checkpoint h3 svg { width: 24px; height: 24px; }
+        .checkpoint ul {
+            list-style: none; padding: 0;
+            margin-top: 16px;
+        }
+        .checkpoint li {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin: 12px 0; color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .checkpoint li svg { width: 18px; height: 18px; color: var(--mars-orange); flex-shrink: 0; margin-top: 4px; }
+        .checkpoint li span { flex: 1; }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between;
+            margin-top: 50px; padding-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .nav-btn {
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--panel-border);
+            padding: 15px 26px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.74rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            transition: transform 0.3s, filter 0.3s, background 0.3s, border-color 0.3s;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -130%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .nav-btn:hover::before { left: 150%; }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-btn:focus-visible { outline: 2px solid var(--mars-glow); outline-offset: 3px; }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--mars-orange), var(--mars-red));
+            border: none;
+            filter: drop-shadow(0 6px 16px rgba(255, 107, 53, 0.35));
+        }
+        .nav-btn.primary:hover { filter: drop-shadow(0 8px 22px rgba(255, 107, 53, 0.5)); }
+        .nav-btn svg { width: 18px; height: 18px; }
+        .nav-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        .simulation-note {
+            border-left: 3px solid var(--mars-orange);
+            background: rgba(255, 107, 53, 0.08);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 0 0 28px;
+        }
+        .guide-toc { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 32px; }
+        .guide-toc a {
+            color: var(--mars-light);
+            text-decoration: none;
+            border: 1px solid var(--panel-border);
+            border-radius: 100px;
+            padding: 7px 13px;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+        }
+        .guide-toc a:hover, .guide-toc a:focus-visible {
+            border-color: var(--mars-orange);
+            background: rgba(255, 107, 53, 0.12);
+        }
+        .content-panel h2[id], .checkpoint[id] { scroll-margin-top: 100px; }
+        .prompt-list { padding-left: 24px; margin: 12px 0 24px; color: var(--text-secondary); }
+        .prompt-list li { margin: 8px 0; }
+
+        @media (max-width: 600px) {
+            .concept-grid { grid-template-columns: 1fr; }
+            .copy-btn { opacity: 1; }
+        }
+        @media (hover: none) {
+            .copy-btn { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav { padding: 14px 20px; }
+            .page-content { padding: 100px 16px 40px; }
+            .content-panel { padding: 30px 24px; }
+            .phase-title { font-size: 1.6rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="12" fill="rgba(255,107,53,0.2)"/>
+                <path d="M20 8v24M8 20h24" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="20" cy="20" r="4" fill="#ff6b35"/>
+            </svg>
+            MISIÓN MARTE
+        </a>
+        <a href="../index.html#expedicion" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver a la expedición
+        </a>
+    </nav>
+
+    <div class="page-content">
+        <div class="content-panel">
+            <div class="phase-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22c-4 0-8-3-8-8 0-3 2-6 4-8 0 2 1 4 3 5 0-3 2-6 4-8 1 3 3 5 3 8 1-1 2-2 2-4 2 2 2 5 2 7 0 5-4 8-8 8z" fill="rgba(255,107,53,0.2)"/>
+                    <path d="M12 22c-2 0-4-2-4-4 0-2 2-4 4-6 2 2 4 4 4 6 0 2-2 4-4 4z"/>
+                </svg>
+                FASE 06 · ENTRY
+            </div>
+            <h1 class="phase-title">Entrada Atmosférica: Observabilidad y Evaluación</h1>
+            <p class="phase-description">
+                Los 7 minutos del terror. Durante la entrada atmosférica nadie en la Tierra puede intervenir en tiempo
+                real: solo queda observar la telemetría y confiar en que el diseño aguanta. Lo mismo pasa con un agente
+                en producción. Instrumenta Control de Misión con OpenTelemetry para ver exactamente qué hizo en cada
+                turno, y evalúa sus respuestas con Azure AI Evaluation para saber si la calidad se sostiene.
+            </p>
+            <p class="simulation-note">
+                El agente sigue siendo el Control de Misión simulado de las fases anteriores, ahora con una tool que
+                consulta subsistemas autónomos de la nave durante la entrada. Lo real aquí es la instrumentación
+                (OpenTelemetry) y la evaluación (Azure AI Evaluation); los datos de la misión siguen siendo inventados.
+            </p>
+
+            <nav class="guide-toc" aria-label="Contenido de la fase">
+                <a href="#preparacion">Preparación</a>
+                <a href="#conceptos">Conceptos clave</a>
+                <a href="#paso1">1 · Observabilidad local</a>
+                <a href="#paso2">2 · Ver las trazas en una interfaz</a>
+                <a href="#paso3">3 · Evaluación básica</a>
+                <a href="#checkpoint">Checkpoint</a>
+            </nav>
+
+            <h2 id="preparacion">Preparación del Entorno</h2>
+            <p>
+                Para esta fase necesitas lo mismo que en las anteriores (<strong>Python 3.12+</strong>,
+                <a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a> y un recurso de
+                <strong>Azure OpenAI</strong> con <code>gpt-5-mini</code>) más el SDK de OpenTelemetry y el paquete de
+                evaluación de Azure AI. A diferencia de APPROACH, ningún paquete de esta fase es beta.
+            </p>
+            <p>
+                <strong>Versiones:</strong> <code>agent-framework-openai</code> 1.18.2 (<code>agent-framework-core</code>
+                1.26.0), <code>opentelemetry-sdk</code>, <code>azure-monitor-opentelemetry</code> (para la Opción 1 del
+                Paso 2, Application Insights), <code>opentelemetry-exporter-otlp-proto-http</code> (para la Opción 2 del
+                Paso 2, un Tempo de Grafana Cloud), <code>azure-ai-evaluation</code> y <code>python-dotenv</code>.
+            </p>
+            <p>
+                Ningún paso de esta fase necesita <strong>Docker</strong>: la Opción 1 del Paso 2 usa un recurso de
+                Azure (Application Insights) y la Opción 2 un stack gratuito de Grafana Cloud. El Paso 1 no necesita
+                nada más que tu terminal.
+            </p>
+
+            <p>Trabajando desde la carpeta <code>phases/06-entry</code> en tu repositorio, instala las dependencias:</p>
+            <pre><code class="language-bash">cd phases/06-entry
+uv sync</code></pre>
+
+            <p>Copia el archivo de plantilla <code>.env.example</code> a <code>.env</code>:</p>
+            <pre><code class="language-bash"># En Linux/macOS:
+cp .env.example .env
+# En Windows:
+Copy-Item .env.example .env</code></pre>
+
+            <p>Completa las variables de tu archivo <code>.env</code>:</p>
+            <pre><code class="language-bash"># Dirección de tu recurso, SIN /openai/v1 al final
+AZURE_OPENAI_ENDPOINT=https://&lt;recurso&gt;.openai.azure.com/
+AZURE_OPENAI_API_KEY=&lt;tu-clave&gt;
+# Nombre de tu implementación del modelo (p.ej. gpt-5-mini-1)
+AZURE_OPENAI_CHAT_COMPLETION_MODEL=&lt;nombre-de-tu-implementacion&gt;
+
+# Observabilidad (Paso 1): spans impresos en tu propia terminal, sin infraestructura
+ENABLE_CONSOLE_EXPORTERS=true
+# Captura prompts, respuestas y argumentos de tools en los spans (solo dev/test)
+# ENABLE_SENSITIVE_DATA=true
+
+# Observabilidad (Paso 2, Opción 1): sin Docker, Azure Application Insights
+# APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=&lt;tu-key&gt;;IngestionEndpoint=https://&lt;region&gt;.in.applicationinsights.azure.com/
+# OTEL_SERVICE_NAME=mars-mission-control
+
+# Observabilidad (Paso 2, Opción 2): sin Docker, un Tempo de Grafana Cloud por OTLP/HTTP
+# Saca estos valores de tu stack de Grafana Cloud en Connections > OpenTelemetry
+# Nota: variable ESPECÍFICA de trazas (no la genérica OTEL_EXPORTER_OTLP_ENDPOINT); Tempo solo acepta trazas
+# OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://otlp-gateway-&lt;region&gt;.grafana.net/otlp/v1/traces
+# OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+# OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic &lt;tu-token-en-base64&gt;
+# OTEL_SERVICE_NAME=mars-mission-control
+# ENABLE_SENSITIVE_DATA=true</code></pre>
+            <p>
+                El archivo <code>.env</code> tiene tu clave: no lo subas al repositorio. Cada capítulo tiene un
+                <code>mission_control.py</code> con ayudantes y sus <code>stepN_*.py</code>, que es donde está lo que se
+                enseña.
+            </p>
+
+            <h2 id="conceptos">Conceptos Clave</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <rect x="8" y="18" width="10" height="18" rx="2"/>
+                        <rect x="19" y="10" width="10" height="26" rx="2" fill="rgba(255,107,53,0.3)"/>
+                        <rect x="30" y="22" width="10" height="14" rx="2"/>
+                    </svg>
+                    <h4>Instrumentación automática</h4>
+                    <p>El framework ya emite spans de cada <code>invoke_agent</code>, <code>chat</code> y
+                        <code>execute_tool</code>. No se agrega código para generarlos: solo se decide a dónde van.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <circle cx="24" cy="10" r="4" fill="rgba(255,107,53,0.3)"/>
+                        <path d="M24 14v10M24 24l-10 8M24 24l10 8"/>
+                        <circle cx="14" cy="38" r="4"/>
+                        <circle cx="34" cy="38" r="4"/>
+                    </svg>
+                    <h4>Span y traza</h4>
+                    <p>Un <em>span</em> es una operación con inicio, fin y atributos. Una <em>traza</em> es el árbol de
+                        spans de un turno completo del agente.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <circle cx="24" cy="24" r="16"/>
+                        <path d="M24 14v4M24 30v4M14 24h4M30 24h4M17 17l3 3M31 31l-3-3M31 17l-3 3M17 31l3-3"/>
+                    </svg>
+                    <h4><code>configure_otel_providers()</code></h4>
+                    <p>Una sola llamada que lee las variables <code>OTEL_EXPORTER_OTLP_*</code> y arma los
+                        exportadores. Se usa una vez, al arrancar el programa.</p>
+                </div>
+                <div class="concept-card">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="#ff6b35" stroke-width="2" aria-hidden="true">
+                        <path d="M10 24h10M24 10v28" stroke-dasharray="1 0"/>
+                        <path d="M8 38h32"/>
+                        <path d="M30 18l6 6-6 6" />
+                        <circle cx="16" cy="24" r="3" fill="rgba(255,107,53,0.3)"/>
+                    </svg>
+                    <h4>Evaluador</h4>
+                    <p>Una función de <code>azure-ai-evaluation</code> que puntúa una respuesta. Se llama sola, o en
+                        lote sobre un dataset con <code>evaluate()</code>.</p>
+                </div>
+            </div>
+
+            <h2 id="paso1">Paso 1 · Observabilidad local: ver trazas en la consola</h2>
+            <p>
+                Carpeta <code>chapter01_observability</code>. Control de Misión ya emite telemetría de OpenTelemetry por
+                sí solo; lo único que falta es decirle a dónde mandarla. La forma más simple, sin ninguna
+                infraestructura, es imprimirla en tu propia terminal.
+            </p>
+            <p>
+                <code>chapter01_observability/mission_control.py</code> define <code>get_autopilot_status</code>: una
+                tool que consulta subsistemas <strong>autónomos</strong> de la nave, los que durante la entrada deciden
+                solos porque nadie en la Tierra puede intervenir a tiempo. Es deliberadamente distinta de la tool de
+                telemetría de TRANSIT: aquí el foco no es el dato físico de la nave, sino observar las llamadas que el
+                propio agente hace al modelo y a sus tools.
+            </p>
+            <pre><code class="language-python">import os
+from typing import Annotated
+
+from dotenv import load_dotenv
+from agent_framework import Agent, tool
+from agent_framework.openai import OpenAIChatCompletionClient
+
+load_dotenv()  # carga las variables del .env (lo busca subiendo de carpeta)
+
+INSTRUCTIONS = (
+    "Eres el Control de Misión de una expedición a Marte "
+    "y das informes técnicos a la tripulación. Usa terminología espacial. "
+    "Responde siempre en una o dos líneas. "
+    "Si no tienes un dato, dilo; no lo inventes."
+)
+
+# Durante la entrada nadie en la Tierra puede intervenir: estos subsistemas deciden solos.
+AUTOPILOT_STATUS = {
+    "guiado": "Computadora de guiado: trayectoria nominal, desviación de 0.3°, sin correcciones pendientes",
+    "secuenciador": "Secuenciador de eventos: próximo evento en T-45s (despliegue de paracaídas), sin bloqueos",
+    "monitor_aborto": "Monitor de aborto: todos los parámetros dentro de límites, sin recomendación de abortar",
+}
+
+
+@tool
+def get_autopilot_status(
+    subsystem: Annotated[str, "Subsistema autónomo a consultar: guiado, secuenciador o monitor_aborto"],
+) -> str:
+    """Devuelve el estado de un subsistema autónomo de la nave durante la entrada atmosférica."""
+    return AUTOPILOT_STATUS.get(subsystem, "Subsistema desconocido")  # dato simulado
+
+
+def create_mission_control() -> Agent:
+    client = OpenAIChatCompletionClient(
+        model=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    )
+    return Agent(
+        client=client,
+        name="MissionControl",
+        instructions=INSTRUCTIONS,
+        tools=[get_autopilot_status],
+    )</code></pre>
+
+            <h3>1.1 · <code>configure_otel_providers()</code>: una llamada, al arrancar</h3>
+            <p>
+                <code>configure_otel_providers()</code> lee las variables de entorno estándar de OpenTelemetry
+                (<code>OTEL_EXPORTER_OTLP_*</code>) y las propias del framework (<code>ENABLE_CONSOLE_EXPORTERS</code>,
+                <code>ENABLE_SENSITIVE_DATA</code>) y arma los exportadores. Se llama <strong>una sola vez</strong>, al
+                principio del programa, antes de correr el agente.
+            </p>
+            <p>Código del script <code>chapter01_observability/step1_console_exporter.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework.observability import configure_otel_providers, get_tracer
+from opentelemetry.trace import SpanKind
+from opentelemetry.trace.span import format_trace_id
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    configure_otel_providers()  # lee ENABLE_CONSOLE_EXPORTERS y OTEL_EXPORTER_OTLP_* del .env
+
+    with get_tracer().start_as_current_span(
+        "Scenario: Guiado durante la entrada", kind=SpanKind.CLIENT
+    ) as span:
+        print(f"Trace ID: {format_trace_id(span.get_span_context().trace_id)}")
+
+        mission_control = create_mission_control()
+        response = await mission_control.run("¿Cómo está el guiado durante la entrada? Consulta el piloto automático.")
+        print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_observability/step1_console_exporter.py</code></pre>
+            <p>
+                Antes de ver el turno completo del agente, así se ve un span individual impreso por el exportador de
+                consola (este es un span manual de prueba, para confirmar que el exportador funciona antes de
+                complicarlo con una llamada real al modelo):
+            </p>
+            <pre><code class="language-json">{
+    "name": "Scenario: Guiado durante la entrada",
+    "context": {
+        "trace_id": "0x49226bc214997461e21d2116faeeba1c",
+        "span_id": "0xd3a72951bac5047a",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.CLIENT",
+    "parent_id": null,
+    "start_time": "2026-11-15T20:04:39.522983Z",
+    "end_time": "2026-11-15T20:04:39.522998Z",
+    "status": { "status_code": "UNSET" },
+    "attributes": {},
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "service.name": "agent_framework",
+            "microsoft.agent-framework": "True",
+            "service.version": "1.26.0"
+        }
+    }
+}</code></pre>
+            <p>
+                Cuando el turno completo corre, el exportador imprime un bloque como este por <strong>cada span</strong>
+                del árbol. Para el ejemplo de arriba (un <code>run()</code> que pide una tool) vas a ver, en orden:
+            </p>
+            <ul>
+                <li><code>Scenario: Guiado durante la entrada</code>: el span que abriste a mano, envuelve todo.</li>
+                <li><code>invoke_agent MissionControl</code>: el turno completo del agente (<code>gen_ai.operation.name=invoke_agent</code>, <code>gen_ai.agent.name=MissionControl</code>).</li>
+                <li><code>chat &lt;tu-implementacion&gt;</code> (dos veces): cada llamada al modelo (<code>gen_ai.operation.name=chat</code>), con <code>gen_ai.usage.input_tokens</code> y <code>gen_ai.usage.output_tokens</code>.</li>
+                <li><code>execute_tool get_autopilot_status</code>: la ejecución de la tool (<code>gen_ai.tool.name=get_autopilot_status</code>).</li>
+            </ul>
+            <p>Sin <code>ENABLE_SENSITIVE_DATA</code>, estos spans traen metadatos (nombres, duración, tokens), pero no el contenido de la conversación.</p>
+
+            <h3>1.2 · Datos sensibles: ver el contenido real</h3>
+            <p>
+                Por defecto los spans no incluyen el texto de los mensajes ni los argumentos de las tools: solo
+                metadatos. <code>ENABLE_SENSITIVE_DATA=true</code> (o <code>enable_sensitive_data=True</code> en el
+                código) habilita que se capture contenido real. Microsoft recomienda esto <strong>solo en desarrollo o
+                pruebas</strong>: ese contenido puede incluir datos del usuario.
+            </p>
+            <p>Código del script <code>chapter01_observability/step2_sensitive_data.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework.observability import configure_otel_providers, get_tracer
+from opentelemetry.trace import SpanKind
+from opentelemetry.trace.span import format_trace_id
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    # Además de leer el .env, forzamos datos sensibles y consola por si no están en el entorno
+    configure_otel_providers(enable_sensitive_data=True, enable_console_exporters=True)
+
+    with get_tracer().start_as_current_span(
+        "Scenario: Guiado con datos sensibles", kind=SpanKind.CLIENT
+    ) as span:
+        print(f"Trace ID: {format_trace_id(span.get_span_context().trace_id)}")
+
+        mission_control = create_mission_control()
+        response = await mission_control.run("¿Cómo está el guiado durante la entrada? Consulta el piloto automático.")
+        print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_observability/step2_sensitive_data.py</code></pre>
+            <p>
+                Con <code>enable_sensitive_data=True</code>, el span <code>execute_tool get_autopilot_status</code> ahora
+                trae <code>gen_ai.tool.call.arguments</code> (<code>{"subsystem": "guiado"}</code>) y
+                <code>gen_ai.tool.call.result</code> (el estado simulado del subsistema); los spans de <code>chat</code>
+                incluyen el texto enviado al modelo y su respuesta. Sin esta variable, nada de eso aparece: solo que una
+                tool llamada <code>get_autopilot_status</code> se ejecutó, cuánto tardó y si falló.
+            </p>
+
+            <h2 id="paso2">Paso 2 · Ver las trazas en una interfaz</h2>
+            <p>
+                Carpeta <code>chapter01_observability</code> (mismo capítulo). La consola sirve para confirmar que algo
+                se emite, pero para explorar una traza —abrir cada span, ver su duración, comparar turnos— hace falta
+                una interfaz. Dos formas de hacerlo, ninguna necesita Docker: Azure Application Insights (su propio
+                SDK) o un backend OTLP genérico como un Tempo de Grafana Cloud (la misma
+                <code>configure_otel_providers()</code> del Paso 1, solo cambian las variables
+                <code>OTEL_EXPORTER_OTLP_*</code> en el <code>.env</code>).
+            </p>
+            <p>
+                Dos detalles antes de empezar, para no sorprenderte con lo que veas (o no veas) en el dashboard:
+            </p>
+            <ul>
+                <li>
+                    <strong>¿No ves el prompt ni la respuesta?</strong> Eso lo controla <code>ENABLE_SENSITIVE_DATA</code>
+                    del Paso 1.2, no el destino de las trazas. Si quieres ver el contenido real, déjalo en
+                    <code>true</code> en tu <code>.env</code>; da igual cuál de las dos opciones uses.
+                </li>
+                <li>
+                    <strong>¿Te aparecen muchas más señales de las que esperabas?</strong> Esto aplica solo a la
+                    Opción 2 (Grafana Cloud / OTLP): <code>OTEL_EXPORTER_OTLP_ENDPOINT</code> (el genérico) hace que
+                    <code>configure_otel_providers()</code> exporte <strong>trazas, métricas y logs</strong> —las tres—
+                    al mismo destino. Un solo turno con una tool ya genera varios spans, varios eventos
+                    <code>gen_ai.*.message</code> (logs) y un par de métricas (duración y tokens). Application Insights
+                    (Opción 1) acepta las tres señales sin problema; si tu backend solo acepta trazas (como Tempo
+                    autoalojado o Grafana Cloud), usa la variable específica
+                    <code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> en vez de la genérica para exportar solo trazas.
+                </li>
+            </ul>
+
+            <h3>2.1 · Opción 1: Azure Application Insights</h3>
+            <p>
+                Si ya tienes un recurso de <a href="https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview" target="_blank" rel="noopener">Application Insights</a>
+                (o una app en Azure con monitoreo activado), es la forma más directa de ver trazas sin Docker.
+                Application Insights <strong>no habla OTLP</strong>: trae su propio SDK,
+                <code>azure-monitor-opentelemetry</code>, con su propia función de configuración. El script de este
+                paso no usa <code>configure_otel_providers()</code> sino <code>configure_azure_monitor()</code> —pero
+                Agent Framework no sabe ni le importa quién configuró el <code>TracerProvider</code> global: sus spans
+                se adjuntan al que esté activo.
+            </p>
+            <ol>
+                <li>Crea un recurso de Application Insights en Azure Portal (o usa uno existente).</li>
+                <li>Copia su cadena de conexión en <strong>Overview → Connection String</strong> y descomenta/completa en tu <code>.env</code>:</li>
+            </ol>
+            <pre><code class="language-bash">APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=&lt;tu-key&gt;;IngestionEndpoint=https://&lt;region&gt;.in.applicationinsights.azure.com/
+OTEL_SERVICE_NAME=mars-mission-control</code></pre>
+            <p>Código del script <code>chapter01_observability/step3_appinsights.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+
+from agent_framework.observability import enable_instrumentation, get_tracer
+from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.trace import SpanKind
+from opentelemetry.trace.span import format_trace_id
+
+from mission_control import create_mission_control
+
+
+async def main() -> None:
+    # Application Insights no habla OTLP: usa su propio SDK, que configura el
+    # TracerProvider global leyendo APPLICATIONINSIGHTS_CONNECTION_STRING del .env.
+    # Agent Framework no sabe ni le importa quién configuró el provider: sus
+    # spans se adjuntan al que esté activo.
+    #
+    # sampling_ratio=1.0 fuerza "siempre capturar". El sampler adaptativo por defecto de
+    # Application Insights estima una tasa de spans/segundo para decidir qué porcentaje
+    # capturar, pensado para un servicio corriendo sin parar; en un script de una sola
+    # corrida como este, esa estimación arranca en casi cero y puede descartar tu única
+    # traza sin avisarte.
+    configure_azure_monitor(sampling_ratio=1.0)
+
+    # enable_instrumentation() releé ENABLE_SENSITIVE_DATA del entorno en este momento.
+    # Hace falta porque el import de arriba (agent_framework.observability) ya fijó su
+    # valor interno la primera vez que Python cargó ese módulo —antes de que
+    # `from mission_control import ...`, más abajo, ejecutara load_dotenv() y pusiera
+    # ENABLE_SENSITIVE_DATA en el entorno. configure_otel_providers() (Opción 2, y los
+    # Pasos 1) no tiene este problema: releé el entorno cada vez que lo llamas.
+    enable_instrumentation()
+
+    with get_tracer().start_as_current_span(
+        "Scenario: Guiado via Application Insights", kind=SpanKind.CLIENT
+    ) as span:
+        print(f"Trace ID: {format_trace_id(span.get_span_context().trace_id)}")
+
+        mission_control = create_mission_control()
+        response = await mission_control.run("¿Cómo está el guiado durante la entrada? Consulta el piloto automático.")
+        print(f"CONTROL: {response.text}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter01_observability/step3_appinsights.py</code></pre>
+            <p>
+                Busca el Trace ID en <strong>Application Insights → Transaction search</strong>, o consulta la tabla
+                <code>dependencies</code>/<code>traces</code> en <strong>Logs</strong>. Vas a ver el mismo árbol de
+                spans del Paso 1 (<code>invoke_agent</code> → <code>chat</code> → <code>execute_tool</code> →
+                <code>chat</code>), navegable, con la duración de cada uno y sus atributos a un clic.
+            </p>
+
+            <details class="free-option">
+                <summary>Opción 2: sin Docker, un Tempo de Grafana Cloud por OTLP (clic para ver detalles)</summary>
+                <p>
+                    <a href="https://grafana.com/products/cloud/" target="_blank" rel="noopener">Grafana Cloud</a>
+                    tiene un nivel gratuito con Tempo (su backend de trazas) ya incluido. A diferencia de la Opción 1,
+                    esta sí habla OTLP: es el mismo <code>configure_otel_providers()</code> del Paso 1, solo cambian
+                    las variables <code>OTEL_EXPORTER_OTLP_*</code> en el <code>.env</code>, sin tocar el código.
+                </p>
+                <ol>
+                    <li>Crea una cuenta gratis en Grafana Cloud y entra a tu stack.</li>
+                    <li>Ve a <strong>Connections → Add new connection → OpenTelemetry (OTLP)</strong> y copia el endpoint OTLP y las credenciales que te da (usuario/instance ID y una API key o token).</li>
+                    <li>Con esos dos datos arma un header <code>Authorization</code> con autenticación básica: <code>Basic &lt;base64(usuario:token)&gt;</code>. La mayoría de los sistemas operativos traen un comando para codificar en base64, por ejemplo <code>echo -n "usuario:token" | base64</code> en Linux/macOS.</li>
+                </ol>
+                <p>
+                    Usa <code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> (no el genérico
+                    <code>OTEL_EXPORTER_OTLP_ENDPOINT</code>): Tempo solo acepta trazas, no métricas ni logs, y la
+                    variable específica hace que el framework exporte <strong>solo</strong> ese signal. Variables de
+                    entorno (reemplazan, no se suman, a las de la Opción 1):
+                </p>
+                <pre><code class="language-bash">OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://otlp-gateway-&lt;region&gt;.grafana.net/otlp/v1/traces
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic &lt;tu-token-en-base64&gt;
+ENABLE_SENSITIVE_DATA=true</code></pre>
+                <p>
+                    Grafana Cloud solo acepta OTLP por HTTP, no por gRPC: por eso cambia
+                    <code>OTEL_EXPORTER_OTLP_PROTOCOL</code>. Y sin <code>ENABLE_SENSITIVE_DATA=true</code> vas a ver
+                    los spans, pero no el texto del prompt ni de la respuesta: esa variable es independiente de a
+                    dónde apunten las trazas.
+                </p>
+                <p>Ejecuta el script de este paso:</p>
+                <pre><code class="language-bash">uv run chapter01_observability/step4_otlp_grafana.py</code></pre>
+                <p>
+                    Entra a tu stack de Grafana Cloud, abre <strong>Explore</strong>, elige el datasource de Tempo y
+                    busca por el Trace ID que imprimió el script. El árbol de spans es el mismo que viste en consola
+                    en el Paso 1, ahora navegable.
+                </p>
+                <p>
+                    <strong>¿Ves los spans pero no el contenido, aunque tu consola sí lo muestra?</strong> No es tu
+                    <code>.env</code>: es una limitación conocida de Grafana Cloud. Su ingesta de OTLP puede descartar
+                    específicamente los atributos de contenido (<code>gen_ai.input.messages</code>,
+                    <code>gen_ai.output.messages</code>, <code>gen_ai.tool.call.arguments</code>,
+                    <code>gen_ai.tool.call.result</code>) mientras conserva el resto del span sin problema —así que ves
+                    el modelo, los tokens y el nombre de la tool, pero no el texto. Es distinto del límite general de
+                    Tempo de 2048 bytes por atributo (que trunca, no elimina, y no debería afectarte con prompts
+                    cortos como los de este laboratorio). Si te pasa, Application Insights (Opción 1) es la forma
+                    confiable de ver el contenido completo; Grafana Cloud te sirve igual para ver la estructura de la
+                    traza, duraciones y metadata.
+                </p>
+            </details>
+
+            <h2 id="paso3">Paso 3 · Evaluación básica con Azure AI Evaluation</h2>
+            <p>
+                Carpeta <code>chapter02_evaluation</code>. Observabilidad dice qué pasó en un turno; evaluación dice si
+                la respuesta fue <strong>buena</strong>. <code>azure-ai-evaluation</code> trae evaluadores listos para
+                usar: unos no necesitan modelo (comparan texto contra texto), otros usan un modelo como juez.
+            </p>
+
+            <h3>3.1 · <code>F1ScoreEvaluator</code>: sin modelo, 100% local</h3>
+            <p>
+                <code>F1ScoreEvaluator</code> compara la respuesta contra una respuesta de referencia
+                (<code>ground_truth</code>) por superposición de palabras: no llama a ningún modelo, así que corre sin
+                credenciales ni costo.
+            </p>
+            <p>Código del script <code>chapter02_evaluation/step1_f1_score.py</code>:</p>
+            <pre><code class="language-python">from azure.ai.evaluation import F1ScoreEvaluator
+
+f1_score = F1ScoreEvaluator(threshold=0.5)
+
+result = f1_score(
+    response="Guiado nominal: trayectoria dentro de parámetros, sin correcciones pendientes.",
+    ground_truth="Computadora de guiado: trayectoria nominal, sin correcciones pendientes.",
+)
+print(result)</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_evaluation/step1_f1_score.py</code></pre>
+            <p>Salida real:</p>
+            <pre><code class="language-plaintext">{'f1_score': 0.823529411764706, 'f1_score_score': 0.823529411764706, 'f1_score_passed': True, 'f1_score_result': 'pass', 'f1_score_reason': None, 'f1_score_status': 'completed', 'f1_score_threshold': 0.5, 'f1_score_properties': None}</code></pre>
+            <p>
+                <code>f1_score</code> es la puntuación (0 a 1); <code>f1_score_passed</code>/<code>f1_score_result</code>
+                comparan contra el <code>threshold</code> que le diste al crear el evaluador. <code>f1_score_reason</code>
+                queda en <code>None</code> porque esta métrica no razona, solo cuenta palabras compartidas.
+            </p>
+
+            <h3>3.2 · <code>RelevanceEvaluator</code> y <code>CoherenceEvaluator</code>: con un modelo como juez</h3>
+            <p>
+                Estos evaluadores no necesitan una respuesta de referencia: le piden a un modelo (el mismo recurso de
+                Azure OpenAI de esta fase) que juzgue la respuesta. <code>model_config</code> usa el mismo
+                <code>TypedDict</code> en ambos evaluadores.
+            </p>
+            <p>Código del script <code>chapter02_evaluation/step2_relevance_and_coherence.py</code>:</p>
+            <pre><code class="language-python">import asyncio
+import os
+
+from azure.ai.evaluation import AzureOpenAIModelConfiguration, CoherenceEvaluator, RelevanceEvaluator
+
+from mission_control import create_mission_control
+
+MODEL_CONFIG: AzureOpenAIModelConfiguration = {
+    "azure_deployment": os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
+    "azure_endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"),
+    "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
+}
+
+
+async def main() -> None:
+    query = "¿Cómo está el guiado durante la entrada? Consulta el piloto automático."
+
+    mission_control = create_mission_control()
+    response = await mission_control.run(query)
+    print(f"CONTROL: {response.text}")
+
+    relevance = RelevanceEvaluator(model_config=MODEL_CONFIG)
+    coherence = CoherenceEvaluator(model_config=MODEL_CONFIG)
+
+    print("Relevancia:", relevance(query=query, response=response.text))
+    print("Coherencia:", coherence(query=query, response=response.text))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_evaluation/step2_relevance_and_coherence.py</code></pre>
+            <p>
+                Cada evaluador devuelve un diccionario con la misma forma que <code>F1ScoreEvaluator</code>
+                (<code>relevance</code>/<code>coherence</code>, su versión <code>_result</code> contra el
+                <code>threshold</code>, y esta vez también <code>relevance_reason</code>/<code>coherence_reason</code>
+                con la justificación del modelo juez, en una escala de 1 a 5).
+            </p>
+
+            <h3>3.3 · <code>evaluate()</code>: evaluación en lote sobre un dataset</h3>
+            <p>
+                Para evaluar muchas respuestas a la vez, <code>evaluate()</code> lee un archivo JSONL, corre los
+                evaluadores que le pases sobre cada fila y guarda un resumen. No necesita ningún proyecto de Azure AI:
+                con <code>data</code> y <code>evaluators</code> alcanza para correr todo en local.
+            </p>
+            <p>Dataset de ejemplo <code>chapter02_evaluation/data.jsonl</code> (una fila por línea):</p>
+            <pre><code class="language-json">{"response": "Guiado nominal: trayectoria dentro de parámetros, sin correcciones pendientes.", "ground_truth": "Computadora de guiado: trayectoria nominal, sin correcciones pendientes."}
+{"response": "No tengo ese dato en el piloto automático.", "ground_truth": "Secuenciador de eventos: próximo evento en T-45s, sin bloqueos."}</code></pre>
+            <p>Código del script <code>chapter02_evaluation/step3_batch_evaluate.py</code>:</p>
+            <pre><code class="language-python">from azure.ai.evaluation import F1ScoreEvaluator, evaluate
+
+result = evaluate(
+    data="data.jsonl",
+    evaluators={"f1_score": F1ScoreEvaluator(threshold=0.5)},
+    output_path="eval_results.json",
+)
+
+print("Métricas agregadas:", result["metrics"])
+print("Primera fila:", result["rows"][0])</code></pre>
+            <p>Ejecución:</p>
+            <pre><code class="language-bash">uv run chapter02_evaluation/step3_batch_evaluate.py</code></pre>
+            <p>Salida real (recortada):</p>
+            <pre><code class="language-plaintext">Métricas agregadas: {'f1_score.f1_score': 0.4705882352941177, 'f1_score.f1_score_score': 0.4705882352941177, 'f1_score.f1_score_passed': 0.5, 'f1_score.binary_aggregate': 0.5}
+Primera fila: {'inputs.response': 'Guiado nominal: ...', 'inputs.ground_truth': 'Computadora de guiado: ...', 'outputs.f1_score.f1_score': 0.823529411764706, 'outputs.f1_score.f1_score_passed': True, ...}</code></pre>
+            <p>
+                <code>result["metrics"]</code> promedia cada métrica sobre todas las filas (<code>f1_score_passed</code>
+                promediado da la <em>tasa de aprobación</em>: 0.5 significa que la mitad de las filas pasó el
+                <code>threshold</code>). <code>result["rows"]</code> trae el detalle fila por fila, con los
+                <code>inputs.*</code> originales y los <code>outputs.&lt;evaluador&gt;.*</code> de cada evaluador.
+                <code>evaluate()</code> también escribe el mismo detalle en <code>eval_results.json</code>. Para usar
+                <code>RelevanceEvaluator</code>/<code>CoherenceEvaluator</code> en lote, agrégalos al diccionario de
+                <code>evaluators</code> y agrega <code>query</code> a cada fila del dataset.
+            </p>
+
+            <div class="checkpoint" id="checkpoint">
+                <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Checkpoint: ENTRY completo
+                </h3>
+                <p>Antes de avanzar a la siguiente fase, verifica que dominas los siguientes hitos:</p>
+                <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Explicar que el framework ya está instrumentado: no se agrega código para generar spans, solo se configura a dónde van con <code>configure_otel_providers()</code>.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Ver trazas localmente con <code>ENABLE_CONSOLE_EXPORTERS=true</code>, sin ninguna infraestructura.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Explicar la diferencia entre metadatos (por defecto) y datos sensibles (<code>ENABLE_SENSITIVE_DATA</code>), y por qué ese segundo modo es solo para desarrollo.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Ver una traza real en una interfaz, sin Docker: con Azure Application Insights (que usa su propio SDK, <code>configure_azure_monitor()</code>, en vez de OTLP) o con un Tempo de Grafana Cloud por OTLP/HTTP (la misma <code>configure_otel_providers()</code> del Paso 1).</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Usar un evaluador sin modelo (<code>F1ScoreEvaluator</code>) y uno con modelo juez (<code>RelevanceEvaluator</code>/<code>CoherenceEvaluator</code>), y saber cuándo usar cada uno.</span></li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Correr <code>evaluate()</code> sobre un dataset JSONL y leer las métricas agregadas y el detalle por fila.</span></li>
+                </ul>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="05-approach.html" class="nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Volver a APPROACH
+                </a>
+                <span class="nav-btn primary disabled">
+                    Próximamente: DESCENT
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Estrellas animadas
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((canvas.width * canvas.height) / 4000);
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.85 ? `hsl(${Math.random() * 40 + 15}, 80%, 75%)` : '#ffffff'
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.opacity += Math.sin(Date.now() * star.twinkleSpeed) * 0.01;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = star.color === '#ffffff' ?
+                    `rgba(255, 255, 255, ${star.opacity})` : star.color;
+                ctx.fill();
+            });
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        let animationFrame = null;
+        function startAnimation() {
+            if (animationFrame === null) animate();
+        }
+        function stopAnimation() {
+            if (animationFrame !== null) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopAnimation();
+            else startAnimation();
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => { resizeCanvas(); startAnimation(); });
+
+        // Botón "Copiar" en cada bloque de código
+        document.querySelectorAll('pre').forEach((pre) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.type = 'button';
+            btn.textContent = 'Copiar';
+            btn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code ? code.innerText : pre.innerText).replace(/\s+$/, '');
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.textContent = '¡Copiado!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copiar';
+                        btn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+            pre.appendChild(btn);
+        });
+    </script>
+</body>
+</html>
